@@ -1,0 +1,15 @@
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+server/var/
+__pycache__/
+temario/
+
+# Clave de firma de la APK: va en GitHub Secrets, nunca en el repo
+*.jks
+*.keystore
+
+# Banco de preguntas externo: no se distribuye
+server/data/preguntas_preparatic.json

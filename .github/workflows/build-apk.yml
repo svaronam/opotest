@@ -1,0 +1,49 @@
+name: Compilar APK
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'android/**', '.github/workflows/**' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preparar la clave de firma (GitHub Secrets)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then echo "::error::Falta el secreto KEYSTORE_BASE64. Ver INSTALACION.md"; exit 1; fi
+          mkdir -p "$(dirname "$GITHUB_WORKSPACE/android/app/opotest.keystore")"
+          echo "$KEYSTORE_BASE64" | base64 -d > "$GITHUB_WORKSPACE/android/app/opotest.keystore"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+      - name: Compilar
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease
+          cp app/build/outputs/apk/release/app-release.apk ../OpoTest.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OpoTest-apk
+          path: OpoTest.apk
+      - name: Publicar en Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}
+          name: OpoTest ${{ github.run_number }}
+          body: APK compilada automáticamente. Descárgala desde el móvil e instálala.
+          files: OpoTest.apk

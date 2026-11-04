@@ -1,0 +1,37 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'es.sergio.opotest'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'es.sergio.opotest'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+    }
+    signingConfigs {
+        // Firma fija para que las actualizaciones se instalen encima de la versión anterior.
+        opotest {
+            storeFile file('opotest.keystore')
+            storePassword System.getenv('KEYSTORE_PASSWORD')
+            keyAlias 'opotest'
+            keyPassword System.getenv('KEYSTORE_PASSWORD')
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.opotest
+        }
+        debug { signingConfig signingConfigs.opotest }
+    }
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

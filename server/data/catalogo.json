@@ -1,0 +1,2546 @@
+{
+ "bloques_a1": {
+  "A1": "A.I Marco constitucional y UE",
+  "A2": "A.II Derecho administrativo",
+  "A3": "A.III Economía y sociedad",
+  "A4": "A.IV Gestión pública",
+  "B1": "B.I Organización y gestión de los SI",
+  "B2": "B.II Tecnología básica",
+  "B3": "B.III Ingeniería de los sistemas de información",
+  "B4": "B.IV Redes, comunicaciones e Internet"
+ },
+ "bloques_a2": {
+  "1": "I. Organización del Estado y Administración electrónica",
+  "2": "II. Tecnología básica",
+  "3": "III. Desarrollo de sistemas",
+  "4": "IV. Sistemas y comunicaciones"
+ },
+ "docs": [
+  {
+   "id": "A1-001",
+   "temario": "A1",
+   "bloque": "A1",
+   "num": 1,
+   "title": "La Constitución Española de 1978 (I). Los principios constitucionales. Los derechos fundamentales y sus garantías. La Corona. Cortes Generales. Congreso de los Diputados y Senado. El Gobierno. Los órganos constitucionales de control del Gobierno: Tribunal de Cuentas, Defensor del Pueblo. La función consultiva: el Consejo de Estado.",
+   "files": [
+    "Temario General/001.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-002",
+   "temario": "A1",
+   "bloque": "A1",
+   "num": 2,
+   "title": "La Constitución Española de 1978 (II). El Poder Judicial. La justicia en la Constitución. El Consejo General del Poder Judicial. El Ministerio Fiscal. El Tribunal Constitucional. Naturaleza, organización y atribuciones.",
+   "files": [
+    "Temario General/002.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-003",
+   "temario": "A1",
+   "bloque": "A1",
+   "num": 3,
+   "title": "La Constitución Española de 1978 (III). Las Comunidades Autónomas: organización política y administrativa. La Administración local: regulación constitucional y entidades que la integran",
+   "files": [
+    "Temario General/003.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-004",
+   "temario": "A1",
+   "bloque": "A1",
+   "num": 4,
+   "title": "La Constitución Española de 1978 (IV). La Administración pública: Principios constitucionales. La Administración General del Estado. Sus órganos centrales.",
+   "files": [
+    "Temario General/004.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-005",
+   "temario": "A1",
+   "bloque": "A1",
+   "num": 5,
+   "title": "La Unión Europea: antecedentes, evolución y objetivos. Los tratados originarios y modificativos. El derecho de la Unión Europea. Relación entre el derecho de la Unión Europea y el ordenamiento jurídico de los Estados miembros. Las instituciones: el Consejo Europeo, el Consejo, la Comisión Europea, el Parlamento Europeo, el Tribunal de Justicia de la Unión Europea, el Tribunal de Cuentas y el Banco Central Europeo.",
+   "files": [
+    "Temario General/005.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-006",
+   "temario": "A1",
+   "bloque": "A1",
+   "num": 6,
+   "title": "Organización territorial de la Administración General del Estado.",
+   "files": [
+    "Temario General/006.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-007",
+   "temario": "A1",
+   "bloque": "A2",
+   "num": 7,
+   "title": "Las fuentes del derecho administrativo. La jerarquía de las fuentes. La ley. Las disposiciones del Gobierno con fuerza de ley: decreto-ley y decreto legislativo. El reglamento: concepto, clases y límites. Otras fuentes del derecho administrativo",
+   "files": [
+    "Temario General/007.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-008",
+   "temario": "A1",
+   "bloque": "A2",
+   "num": 8,
+   "title": "El régimen jurídico de las Administraciones Públicas. La colaboración entre Administraciones mediante acuerdos y convenios. La colaboración público-privada. El procedimiento administrativo y la relación de los ciudadanos con las Administraciones Públicas.",
+   "files": [
+    "Temario General/008.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-009",
+   "temario": "A1",
+   "bloque": "A2",
+   "num": 9,
+   "title": "La revisión de los actos en vía administrativa. Los recursos administrativos. El recurso contencioso administrativo.",
+   "files": [
+    "Temario General/009.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-010",
+   "temario": "A1",
+   "bloque": "A2",
+   "num": 10,
+   "title": "La responsabilidad patrimonial de las Administraciones públicas. Procedimiento de responsabilidad patrimonial. La acción de responsabilidad.",
+   "files": [
+    "Temario General/010.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-011",
+   "temario": "A1",
+   "bloque": "A2",
+   "num": 11,
+   "title": "Los contratos de las Administraciones públicas. Principios comunes. La Ley de Contratos del Sector Público. Requisitos necesarios para la celebración de los contratos. Procedimientos de contratación y formas de adjudicación. Tipos de contratos y características generales. La facturación en el sector público",
+   "files": [
+    "Temario General/011.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-012",
+   "temario": "A1",
+   "bloque": "A2",
+   "num": 12,
+   "title": "Los presupuestos generales del Estado. Estructura del presupuesto: clasificación de los gastos. Las modificaciones presupuestarias. La ejecución del gasto y su control. El control interno: la Intervención General de la Administración del Estado. El control externo: el Tribunal de Cuentas y las Cortes Generales.",
+   "files": [
+    "Temario General/012.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-013",
+   "temario": "A1",
+   "bloque": "A2",
+   "num": 13,
+   "title": "Los convenios. Las encomiendas de gestión o encargos a medios propios personificados. Límites en su utilización. La colaboración público-privada en la prestación de los servicios públicos. El régimen jurídico de las subvenciones públicas. Procedimiento.",
+   "files": [
+    "Temario General/013.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-014",
+   "temario": "A1",
+   "bloque": "A3",
+   "num": 14,
+   "title": "El modelo económico español en el marco de la economía mundial. El crecimiento sostenible y las políticas ambientales. La Agenda 2030 y los Objetivos de Desarrollo Sostenible. Líneas generales de la política económica actual. La renta nacional. Evolución y distribución. La internacionalización de la economía española. Comercio exterior y balanza de pagos.",
+   "files": [
+    "Temario General/014.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-015",
+   "temario": "A1",
+   "bloque": "A3",
+   "num": 15,
+   "title": "El sector primario. El sector industrial. El sector servicios. Los subsectores de comercio, transportes y comunicaciones. El turismo",
+   "files": [
+    "Temario General/015.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-016",
+   "temario": "A1",
+   "bloque": "A3",
+   "num": 16,
+   "title": "La estructura social. Tendencias demográficas. Políticas de igualdad de género. Discapacidad y Dependencia. Política contra la violencia de género.",
+   "files": [
+    "Temario General/016.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-017",
+   "temario": "A1",
+   "bloque": "A3",
+   "num": 17,
+   "title": "El mercado de trabajo: evolución y características actuales. Principales magnitudes. Políticas públicas de empleo.",
+   "files": [
+    "Temario General/017.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-018",
+   "temario": "A1",
+   "bloque": "A3",
+   "num": 18,
+   "title": "El impacto de las tecnologías de la información y las comunicaciones en la sociedad. La brecha digital. Nuevos hábitos de relación y de consumo de la información.",
+   "files": [
+    "Temario General/018.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-019",
+   "temario": "A1",
+   "bloque": "A3",
+   "num": 19,
+   "title": "El impacto de las tecnologías de la información y las comunicaciones en la economía y en el mercado de trabajo. Principales magnitudes 7 BIBLIOGRAFÍA BÁSICA .............................................................................................47 7.1 BIBLIOGRAFÍA BÁSICA .......................................................................................47 7.2 BIBLIOGRAFÍA PARA AMPLIAR EL TEMA...........................................................47",
+   "files": [
+    "Temario General/019.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-020",
+   "temario": "A1",
+   "bloque": "A4",
+   "num": 20,
+   "title": "La función gerencial en las Administraciones públicas. Particularidades de la gestión pública.",
+   "files": [
+    "Temario General/020.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-021",
+   "temario": "A1",
+   "bloque": "A4",
+   "num": 21,
+   "title": "Liderazgo. Gestión de competencias y personas. Gestión de conflictos e inteligencia emocional en el puesto de trabajo. Técnicas de negociación y gestión comercial.",
+   "files": [
+    "Temario General/021.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-022",
+   "temario": "A1",
+   "bloque": "A4",
+   "num": 22,
+   "title": "La calidad en los servicios públicos y el papel de las TIC en su modernización. La legislación en materia de sociedad de la información y administración electrónica en España y Europa.",
+   "files": [
+    "Temario General/022.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-023",
+   "temario": "A1",
+   "bloque": "A4",
+   "num": 23,
+   "title": "La crisis de la burocracia como sistema de gestión. La adecuación de técnicas del sector privado. El «management» público y la gobernanza. Hacia la excelencia en las instituciones públicas.",
+   "files": [
+    "Temario General/023.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-024",
+   "temario": "A1",
+   "bloque": "A4",
+   "num": 24,
+   "title": "Empleo Público en España. Tipología del empleo público. Estatuto Básico del Empleado Público. Planificación de recursos humanos en las Administraciones Públicas: la oferta de empleo público. Ley de Incompatibilidades del personal al servicio de las Administraciones Públicas.",
+   "files": [
+    "Temario General/024.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-025",
+   "temario": "A1",
+   "bloque": "A4",
+   "num": 25,
+   "title": "La gobernanza pública y el gobierno abierto. Concepto y principios informadores del gobierno abierto: colaboración, participación, transparencia y rendición de cuentas. Datos abiertos y reutilización. El marco jurídico y los planes de gobierno abierto en España. La Ley 19/2013, de 9 de diciembre, de transparencia, acceso a la información pública y buen gobierno. El Consejo de Transparencia y Buen Gobierno: Real Decreto 919/2014, de 31 de octubre, por el que se aprueba su estatuto. Funciones. La Oficina de Transparencia y Acceso a la Información (OTAI): Funciones. El Portal de Transparencia. Las Unidades de Información y Transparencia (UITS): Funciones. La transparencia y el acceso a la información en las comunidades autónomas y entidades locales",
+   "files": [
+    "Temario General/025.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-026",
+   "temario": "A1",
+   "bloque": "A4",
+   "num": 26,
+   "title": "La dinamización y el apoyo a la actividad económica y al emprendimiento. La garantía de la unidad de mercado.",
+   "files": [
+    "Temario General/026.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-027",
+   "temario": "A1",
+   "bloque": "A4",
+   "num": 27,
+   "title": "La política de protección de datos de carácter personal. Régimen jurídico. El Reglamento UE 2016/679, de 27 de abril, relativo a la protección de las personas físicas en lo que respecta al tratamiento de datos personales y a la libre circulación de estos datos. Principios y derechos. Obligaciones. El Delegado de Protección de Datos en las Administraciones Públicas. La Agencia Española de Protección de Datos.",
+   "files": [
+    "Temario General/027.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-028",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 28,
+   "title": "Definición, estructura, y dimensionamiento eficiente de los sistemas de información.",
+   "files": [
+    "Temario Especifico/vol1/028.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-029",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 29,
+   "title": "La información en las organizaciones. Las organizaciones basadas en la información. La Administración como caso específico de este tipo de organización.",
+   "files": [
+    "Temario Especifico/vol1/029.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-030",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 30,
+   "title": "Gobernanza TIC.",
+   "files": [
+    "Temario Especifico/vol1/030.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-031",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 31,
+   "title": "Reutilización de la Información en el Sector Público en Europa y España. Papel de las TIC en la implantación de políticas de datos abiertos y transparencia",
+   "files": [
+    "Temario Especifico/vol1/031.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-032",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 32,
+   "title": "Estrategia, objetivos y funciones del directivo de sistemas y tecnologías de la información en la Administración.",
+   "files": [
+    "Temario Especifico/vol1/032.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-033",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 33,
+   "title": "Herramientas de planificación y control de gestión de la función del directivo de Sistemas y Tecnologías de la Información en la Administración. El Cuadro de Mando",
+   "files": [
+    "Temario Especifico/vol1/033.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-034",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 34,
+   "title": "Organización y funcionamiento de un Centro de Sistemas de Información. Funciones de: desarrollo, mantenimiento, sistemas, bases de datos, comunicaciones, seguridad, calidad, microinformática y atención a usuarios",
+   "files": [
+    "Temario Especifico/vol1/034.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-035",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 35,
+   "title": "Dirección y gestión de proyectos de tecnologías de la información. Planificación estratégica, gestión de recursos, seguimiento de proyectos, toma de decisiones",
+   "files": [
+    "Temario Especifico/vol1/035.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-036",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 36,
+   "title": "Metodologías predictivas para la gestión de proyectos: GANTT, PERT",
+   "files": [
+    "Temario Especifico/vol1/036.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-037",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 37,
+   "title": "Metodologías ágiles para la gestión de proyectos. Metodologías lean",
+   "files": [
+    "Temario Especifico/vol1/037.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-038",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 38,
+   "title": "Auditoría Informática. Concepto y contenidos. Administración, planeamiento, organización, infraestructura técnica y prácticas operativas",
+   "files": [
+    "Temario Especifico/vol1/038.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-039",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 39,
+   "title": "La gestión de la compra pública de tecnologías de la información",
+   "files": [
+    "Temario Especifico/vol1/039.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-040",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 40,
+   "title": "Adquisición de sistemas: estudio de alternativas, evaluación de la viabilidad y toma de decisión.",
+   "files": [
+    "Temario Especifico/vol1/040.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-041",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 41,
+   "title": "Alternativas básicas de decisión en el campo del equipamiento hardware y software",
+   "files": [
+    "Temario Especifico/vol1/041.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-042",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 42,
+   "title": "La rentabilidad de las inversiones en los proyectos de Tecnologías de la Información",
+   "files": [
+    "Temario Especifico/vol1/042.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-043",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 43,
+   "title": "La protección jurídica de los programas de ordenador. Los medios de comprobación de la legalidad y control del software",
+   "files": [
+    "Temario Especifico/vol1/043.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-044",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 44,
+   "title": "Accesibilidad y usabilidad. W3C. Diseño universal. Diseño web adaptativo.",
+   "files": [
+    "Temario Especifico/vol1/044.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-045",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 45,
+   "title": "Interoperabilidad de sistemas (1). El Esquema Nacional de Interoperabilidad. Dimensiones de la interoperabilidad Editado por ASTIC en 2019 a partir de los temas numerados anteriormente como:",
+   "files": [
+    "Temario Especifico/vol1/045.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-046",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 46,
+   "title": "Interoperabilidad de sistemas (2). Las Normas Técnicas de Interoperabilidad. Interoperabilidad de los documentos y expedientes electrónicos y normas para el intercambio de datos entre Administraciones Públicas",
+   "files": [
+    "Temario Especifico/vol1/046.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-047",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 47,
+   "title": "Seguridad de sistemas (1). Análisis y gestión de riesgos. Herramientas.",
+   "files": [
+    "Temario Especifico/vol1/047.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-048",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 48,
+   "title": "Seguridad de sistemas (2). El Esquema Nacional de Seguridad. Adecuación al Esquema Nacional de Seguridad. Estrategia Nacional de Seguridad. CCN-STIC",
+   "files": [
+    "Temario Especifico/vol1/048.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-049",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 49,
+   "title": "Infraestructuras, servicios comunes y compartidos para la interoperabilidad entre AAPPs. Cl@ve, la Carpeta Ciudadana, el Sistema de Interconexión de Registros, la Plataforma de Intermediación de Datos, y otros servicios",
+   "files": [
+    "Temario Especifico/vol1/049.pdf",
+    "Temario Especifico/vol1/049 anexo.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-050",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 50,
+   "title": "Organizaciones internacionales y nacionales de normalización. Pruebas de conformidad y certificación. El establecimiento de servicios de pruebas de conformidad",
+   "files": [
+    "Temario Especifico/vol1/050.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-051",
+   "temario": "A1",
+   "bloque": "B1",
+   "num": 51,
+   "title": "Planes y Actuaciones de la Agenda Digital para España. Descripción, estructura y objetivos de los planes. El mercado Único Digital",
+   "files": [
+    "Temario Especifico/vol1/051.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-052",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 52,
+   "title": "Sistemas de altas prestaciones. Grid Computing. Mainframe.",
+   "files": [
+    "Temario Especifico/vol2/052.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-053",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 53,
+   "title": "Equipos departamentales y servidores.",
+   "files": [
+    "Temario Especifico/vol2/053.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-054",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 54,
+   "title": "Dispositivos personales de PC y dispositivos móviles. La conectividad de los dispositivos personales. Medidas de seguridad y gestión para equipos personales y dispositivos móviles.",
+   "files": [
+    "Temario Especifico/vol2/054.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-055",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 55,
+   "title": "Cloud Computing. IaaS, PaaS, SaaS. Nubes privadas, pública e híbridas",
+   "files": [
+    "Temario Especifico/vol2/055.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-056",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 56,
+   "title": "Sistemas de almacenamiento para sistemas grandes y departamentales. Dispositivos para tratamiento de información multimedia. Virtualización del almacenamiento. Copias de seguridad.",
+   "files": [
+    "Temario Especifico/vol2/056.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-057",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 57,
+   "title": "Tipos de sistemas de información multiusuario. Sistemas grandes, medios y pequeños. Servidores de datos y de aplicaciones. Virtualización de servidores.",
+   "files": [
+    "Temario Especifico/vol2/057.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-058",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 58,
+   "title": "El procesamiento cooperativo y la arquitectura cliente-servidor. Arquitectura SOA.",
+   "files": [
+    "Temario Especifico/vol2/058.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-059",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 59,
+   "title": "Conceptos y fundamentos de sistemas operativos. Evolución y tendencias",
+   "files": [
+    "Temario Especifico/vol2/059.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-060",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 60,
+   "title": "Sistemas operativos UNIX-LINUX. Fundamentos, administración, instalación, gestión.",
+   "files": [
+    "Temario Especifico/vol2/060.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-061",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 61,
+   "title": "Sistemas operativos Microsoft. Fundamentos, administración, instalación, gestión",
+   "files": [
+    "Temario Especifico/vol2/061.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-062",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 62,
+   "title": "Conceptos básicos de otros sistemas operativos: OS X, iOS, Android, z/OS. Sistemas operativos para dispositivos móviles",
+   "files": [
+    "Temario Especifico/vol2/062.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-063",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 63,
+   "title": "Los sistemas de gestión de bases de datos SGBD. El modelo de referencia de ANSI",
+   "files": [
+    "Temario Especifico/vol2/063.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-064",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 64,
+   "title": "El modelo relacional. El lenguaje SQL. Normas y estándares para la interoperabilidad entre gestores de bases de datos relacionales",
+   "files": [
+    "Temario Especifico/vol2/064.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-065",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 65,
+   "title": "Arquitectura de desarrollo en la web. Desarrollo web front-end. Scripts de cliente. Frameworks. UX. Desarrollo web en servidor, conexión a bases de datos e interconexión con sistemas y servicios.",
+   "files": [
+    "Temario Especifico/vol2/065.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-066",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 66,
+   "title": "Entorno de desarrollo Microsoft .NET",
+   "files": [
+    "Temario Especifico/vol2/066.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-067",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 67,
+   "title": "Entorno de desarrollo JAVA",
+   "files": [
+    "Temario Especifico/vol2/067.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-068",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 68,
+   "title": "Entorno de desarrollo PHP",
+   "files": [
+    "Temario Especifico/vol2/068.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-069",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 69,
+   "title": "Software de código abierto. Software libre. Conceptos base. Aplicaciones en entorno ofimático y servidores Web",
+   "files": [
+    "Temario Especifico/vol2/069.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-070",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 70,
+   "title": "Inteligencia artificial: la orientación heurística, inteligencia artificial distribuida, agentes inteligentes",
+   "files": [
+    "Temario Especifico/vol2/070.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-071",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 71,
+   "title": "Gestión del conocimiento: representación del conocimiento. Sistemas expertos. Herramientas",
+   "files": [
+    "Temario Especifico/vol2/071.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-072",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 72,
+   "title": "Sistemas CRM (Customer Relationship Management) y ERP (Enterprise Resource Planning). Generación de informes a la Dirección",
+   "files": [
+    "Temario Especifico/vol2/072.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-073",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 73,
+   "title": "E-Learning: Conceptos, herramientas, sistemas de implantación y normalización",
+   "files": [
+    "Temario Especifico/vol2/073.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-074",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 74,
+   "title": "Los sistemas de Información geográfica. Conceptos y funcionalidad básicos",
+   "files": [
+    "Temario Especifico/vol2/074.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-075",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 75,
+   "title": "Datawarehouse y minería de datos.",
+   "files": [
+    "Temario Especifico/vol2/075.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-076",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 76,
+   "title": "Big Data. Captura, análisis, transformación, almacenamiento y explotación de conjuntos masivos de datos. Entornos Hadoop o similares. Bases de datos NoSQL.",
+   "files": [
+    "Temario Especifico/vol2/076.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-077",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 77,
+   "title": "Lenguajes y herramientas para la utilización de redes globales. HTML, CSS y XML. Navegadores web y compatibilidad con estándares",
+   "files": [
+    "Temario Especifico/vol2/077.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-078",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 78,
+   "title": "Comercio electrónico. Mecanismos de pago. Gestión del negocio. Factura electrónica. Pasarelas de pago",
+   "files": [
+    "Temario Especifico/vol2/078.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-079",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 79,
+   "title": "El cifrado. Algoritmos de cifrado simétricos y asimétricos. La función hash. El notariado",
+   "files": [
+    "Temario Especifico/vol2/079.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-080",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 80,
+   "title": "Identificación y firma electrónica (1) Marco europeo y nacional. Certificados digitales. Claves privadas, públicas y concertadas. Formatos de firma electrónica. Protocolos de directorio basados en LDAP y X.500. Otros servicios",
+   "files": [
+    "Temario Especifico/vol2/080.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-081",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 81,
+   "title": "Identificación y firma electrónica (2) Prestación de servicios públicos y privados. Infraestructura de clave pública (PKI). Mecanismos de identificación y firma: «Smart Cards», DNI electrónico, mecanismos biométricos",
+   "files": [
+    "Temario Especifico/vol2/081.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-082",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 82,
+   "title": "Adaptación de aplicaciones y entornos a los requisitos de la normativa de protección de datos según los niveles de seguridad. Herramientas de cifrado y auditoría.",
+   "files": [
+    "Temario Especifico/vol2/082.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-083",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 83,
+   "title": "El tratamiento de imágenes. Tecnologías de digitalización y de impresión. Impresión 3D",
+   "files": [
+    "Temario Especifico/vol2/083.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-084",
+   "temario": "A1",
+   "bloque": "B2",
+   "num": 84,
+   "title": "Reconocimiento óptico de caracteres (OCR, ICR). Reconocimiento biométrico",
+   "files": [
+    "Temario Especifico/vol2/084.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-085",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 85,
+   "title": "El ciclo de vida de los sistemas de información. Modelos del ciclo de vida",
+   "files": [
+    "Temario Especifico/vol3/085.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-086",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 86,
+   "title": "Planificación estratégica de sistemas de información y de comunicaciones. El plan de sistemas de información",
+   "files": [
+    "Temario Especifico/vol3/086.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-087",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 87,
+   "title": "Análisis funcional de sistemas, casos de uso e historias de usuario. Metodologías de desarrollo de sistemas. Metodologías ágiles: Scrum y Kanban",
+   "files": [
+    "Temario Especifico/vol3/087.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-088",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 88,
+   "title": "Análisis del dominio de los sistemas: Modelado de dominio, modelo entidad relación y modelos de clases",
+   "files": [
+    "Temario Especifico/vol3/088.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-089",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 89,
+   "title": "Análisis dinámico de sistemas: Modelado de procesos, modelado dinámico y BPMN (Business Process Model and Notation)",
+   "files": [
+    "Temario Especifico/vol3/089.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-090",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 90,
+   "title": "Análisis de aspectos no funcionales: Rendimiento, seguridad, privacidad",
+   "files": [
+    "Temario Especifico/vol3/090.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-091",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 91,
+   "title": "Diseño arquitectónico de sistemas. Diagramas de despliegue",
+   "files": [
+    "Temario Especifico/vol3/091.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-092",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 92,
+   "title": "Técnicas de diseño de software. Diseño por capas y patrones de diseño",
+   "files": [
+    "Temario Especifico/vol3/092.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-093",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 93,
+   "title": "La elaboración de prototipos en el desarrollo de sistemas. Diseño de interfaces de aplicaciones",
+   "files": [
+    "Temario Especifico/vol3/093.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-094",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 94,
+   "title": "La metodología de planificación y desarrollo de los sistemas de información",
+   "files": [
+    "Temario Especifico/vol3/094.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-095",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 95,
+   "title": "Procesos de pruebas y garantía de calidad en el desarrollo de software. Planificación, estrategia de pruebas y estándares. Niveles, técnicas y herramientas de pruebas de software. Criterios de aceptación de software",
+   "files": [
+    "Temario Especifico/vol3/095.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-096",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 96,
+   "title": "Modelos de integración continua. Herramientas y sus aplicaciones",
+   "files": [
+    "Temario Especifico/vol3/096.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-097",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 97,
+   "title": "Métricas y evaluación de la calidad del software. La implantación de la función calidad",
+   "files": [
+    "Temario Especifico/vol3/097.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-098",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 98,
+   "title": "La estimación de recursos y esfuerzo en el desarrollo de sistemas de información",
+   "files": [
+    "Temario Especifico/vol3/098.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-099",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 99,
+   "title": "La migración de aplicaciones en el marco de procesos de ajuste dimensional y por obsolescencia técnica. Gestión de la configuración y de versiones. Gestión de entornos",
+   "files": [
+    "Temario Especifico/vol3/099.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-100",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 100,
+   "title": "Mantenimiento de sistemas. Mantenimiento predictivo, adaptativo y correctivo. Planificación y gestión del mantenimiento",
+   "files": [
+    "Temario Especifico/vol3/100.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-101",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 101,
+   "title": "Gestión de cambios en proyectos de desarrollo software. Gestión de la configuración y de versiones. Gestión de entornos.",
+   "files": [
+    "Temario Especifico/vol3/101.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-102",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 102,
+   "title": "La calidad en los servicios de información. El Modelo EFQM y la Guía para los servicios ISO 9004",
+   "files": [
+    "Temario Especifico/vol3/102.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-103",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 103,
+   "title": "Gestión documental. Gestión de contenidos. Tecnologías CMS y DMS de alta implantación",
+   "files": [
+    "Temario Especifico/vol3/103.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-104",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 104,
+   "title": "Sistemas de recuperación de la información. Políticas, procedimientos y métodos para la conservación de la información",
+   "files": [
+    "Temario Especifico/vol3/104.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-105",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 105,
+   "title": "Planificación y control de las TIC: Gestión de servicios e infraestructuras TIC, gestión de valor de las TIC. Acuerdos de Nivel de Servicio. Gestión de incidencias. Bases conceptuales de ITIL (IT Infrastructure Library), y CoBIT (Control Objetives for Information and Related Technology), objetivos de control y métricas",
+   "files": [
+    "Temario Especifico/vol3/105.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-106",
+   "temario": "A1",
+   "bloque": "B3",
+   "num": 106,
+   "title": "Las tecnologías emergentes. Concepto. Clasificación, aspectos jurídicos y aplicaciones.",
+   "files": [
+    "Temario Especifico/vol3/106.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-107",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 107,
+   "title": "Redes de telecomunicaciones. Conceptos. Medios de transmisión. Conmutación de circuitos y paquetes. Protocolos de encaminamiento. Infraestructuras de acceso. Interconexión de redes. Calidad de servicio",
+   "files": [
+    "Temario Especifico/vol4/107.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-108",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 108,
+   "title": "La red Internet y los servicios básicos",
+   "files": [
+    "Temario Especifico/vol4/108.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-109",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 109,
+   "title": "Sistemas de cableado y equipos de interconexión de redes",
+   "files": [
+    "Temario Especifico/vol4/109.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-110",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 110,
+   "title": "El modelo de referencia de interconexión de sistemas abiertos (OSI) de ISO: arquitectura, capas, interfaces, protocolos, direccionamiento y encaminamiento",
+   "files": [
+    "Temario Especifico/vol4/110.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-111",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 111,
+   "title": "Tecnologías de acceso: Fibra (GPON, FTTH), Móviles (LTE), Inalámbrica",
+   "files": [
+    "Temario Especifico/vol4/111.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-112",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 112,
+   "title": "Redes de transporte: JDSxWDM, MPLS. Redes de agregación: ATM, Carrier Ethernet - VPLS (H-VPLS)",
+   "files": [
+    "Temario Especifico/vol4/112.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-113",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 113,
+   "title": "Redes inalámbricas: el estándar IEEE 802.11. Características funcionales y técnicas. Sistemas de expansión del espectro. Sistemas de acceso. Autenticación. Modos de operación. Bluetooth. Seguridad, normativa reguladora.",
+   "files": [
+    "Temario Especifico/vol4/113.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-114",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 114,
+   "title": "Redes IP: arquitectura de redes, encaminamiento y calidad de servicio. Transición y convivencia IPv4 – IPv6. Funcionalidades específicas de IPv6.",
+   "files": [
+    "Temario Especifico/vol4/114.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-115",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 115,
+   "title": "Redes de nueva generación y servicios convergentes (NGN/IMS). VoIP, ToIP y comunicaciones unificadas",
+   "files": [
+    "Temario Especifico/vol4/115.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-116",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 116,
+   "title": "La Transformación Digital e Industria 4.0: Ciudades inteligentes. Internet de las Cosas (IoT)",
+   "files": [
+    "Temario Especifico/vol4/116.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-117",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 117,
+   "title": "Redes de área local. Arquitectura. Tipología. Medios de transmisión. Métodos de acceso. Dispositivos de interconexión. Gestión de dispositivos. Administración de Redes LAN. Gestión de usuarios en redes locales. Monitorización y control de tráfico. Gestión SNMP. Configuración y gestión de redes virtuales (VLAN). Redes de área extensa.",
+   "files": [
+    "Temario Especifico/vol4/117.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-118",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 118,
+   "title": "Arquitectura de las redes Intranet y Extranet. Concepto, estructura y características. Su implantación en las organizaciones. Modelo de capas: Servidores de aplicaciones, servidores de datos, granjas de servidores",
+   "files": [
+    "Temario Especifico/vol4/118.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-119",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 119,
+   "title": "Las redes públicas de transmisión de datos. La red SARA. La red sTESTA. Planificación y gestión de redes",
+   "files": [
+    "Temario Especifico/vol4/119.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-120",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 120,
+   "title": "Telecomunicaciones por cable (CATV). Estructura de la red de cable. Operadores del mercado. Servicios de red",
+   "files": [
+    "Temario Especifico/vol4/120.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-121",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 121,
+   "title": "El correo electrónico. Servicios de mensajería. Servicios de directorio.",
+   "files": [
+    "Temario Especifico/vol4/121.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-122",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 122,
+   "title": "Las comunicaciones móviles. Generaciones de tecnologías de telefonía móvil",
+   "files": [
+    "Temario Especifico/vol4/122.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-123",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 123,
+   "title": "Aplicaciones móviles. Características, tecnologías, distribución y tendencias",
+   "files": [
+    "Temario Especifico/vol4/123.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-124",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 124,
+   "title": "La seguridad en redes. Tipos de ataques y herramientas para su prevención: cortafuegos, control de accesos e intrusiones, técnicas criptográficas, etc. Medidas específicas para las comunicaciones móviles",
+   "files": [
+    "Temario Especifico/vol4/124.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-125",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 125,
+   "title": "La seguridad en el nivel de aplicación. Tipos de ataques y protección de servicios web, bases de datos e interfaces de usuario.",
+   "files": [
+    "Temario Especifico/vol4/125.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-126",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 126,
+   "title": "Ciberseguridad. La Estrategia Nacional de Ciberseguridad.",
+   "files": [
+    "Temario Especifico/vol4/126.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-127",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 127,
+   "title": "La gestión de la continuidad del negocio. Planes de Continuidad y Contingencia del Negocio",
+   "files": [
+    "Temario Especifico/vol4/127.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-128",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 128,
+   "title": "Normas Reguladoras de las Telecomunicaciones. La Comisión Nacional de los Mercados y la Competencia (CNMC): Organización, funciones y competencia en el ámbito de las telecomunicaciones",
+   "files": [
+    "Temario Especifico/vol4/128.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-129",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 129,
+   "title": "Sistemas de videoconferencia. Herramientas de trabajo en grupo. Dimensionamiento y calidad de servicio en las comunicaciones y acondicionamiento de salas y equipos. Streaming de video",
+   "files": [
+    "Temario Especifico/vol4/129.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-130",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 130,
+   "title": "Acceso remoto a sistemas corporativos: gestión de identidades, single sign-on y teletrabajo",
+   "files": [
+    "Temario Especifico/vol4/130.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-131",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 131,
+   "title": "Virtualización de sistemas y centros de datos. Virtualización de puestos de trabajo. Maquetas de terminales Windows y de servidores Linux",
+   "files": [
+    "Temario Especifico/vol4/131.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A1-132",
+   "temario": "A1",
+   "bloque": "B4",
+   "num": 132,
+   "title": "Web 2.0. Herramientas de trabajo colaborativo y redes sociales. La Guía de comunicación digital de la Administración del Estado",
+   "files": [
+    "Temario Especifico/vol4/132.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-I-01",
+   "temario": "A2",
+   "bloque": "I",
+   "num": 1,
+   "title": "La Constitución Española de 1978. Derechos y deberes fundamentales. Su garantía y suspensión. La Corona: funciones constitucionales del Rey.",
+   "files": [
+    "Bloque 1/Tema 1 - La Constitución Española de 1978. Derechos y deberes fundamentales. Su garantía y suspensión. La Corona funciones constitucionales del Rey..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-I-02",
+   "temario": "A2",
+   "bloque": "I",
+   "num": 2,
+   "title": "Las Cortes Generales: atribuciones del Congreso de los Diputados y del Senado. El Tribunal Constitucional: composición y atribuciones. El Defensor del Pueblo.",
+   "files": [
+    "Bloque 1/Tema 2 - Las Cortes Generales atribuciones del Congreso de los Diputados y del Senado. El Tribunal Constitucional composición y atribuciones. El Defensor del Pueblo..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-I-03",
+   "temario": "A2",
+   "bloque": "I",
+   "num": 3,
+   "title": "El Gobierno: composición, nombramiento y cese. Las funciones del Gobierno. Relaciones entre el Gobierno y las Cortes Generales.",
+   "files": [
+    "Bloque 1/Tema 3 - El Gobierno composición, nombramiento y cese. Las funciones del Gobierno. Relaciones entre el Gobierno y las Cortes Generales..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-I-04",
+   "temario": "A2",
+   "bloque": "I",
+   "num": 4,
+   "title": "La Ley 19/2013, de 9 de diciembre, de transparencia, acceso a la información pública y buen gobierno. La Agenda 2030 y los Objetivos de Desarrollo Sostenible.",
+   "files": [
+    "Bloque 1/Tema 4 - La Ley 192013, de 9 de diciembre, de transparencia, acceso a la información pública y buen gobierno. La Agenda 2030 y los Objetivos de Desarrollo Sostenible..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-I-05",
+   "temario": "A2",
+   "bloque": "I",
+   "num": 5,
+   "title": "Políticas de igualdad y contra la violencia de género. Políticas de igualdad de trato y no discriminación de las personas LGTBI. Discapacidad y dependencia: régimen jurídico.",
+   "files": [
+    "Bloque 1/Tema 5 - Políticas de igualdad y contra la violencia de género. Políticas de igualdad de trato y no discriminación de las personas LGTBI. Discapacidad y dependencia régimen jurídico..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-I-06",
+   "temario": "A2",
+   "bloque": "I",
+   "num": 6,
+   "title": "La sociedad de la información. La Agenda Digital para España. Identidad y firma electrónica: régimen jurídico. Reglamento eIDAS. El DNI electrónico.",
+   "files": [
+    "Bloque 1/Tema 6 - La sociedad de la información. La Agenda Digital para España. Identidad y firma electrónica régimen jurídico. Reglamento eIDAS. El DNI electrónico..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-I-07",
+   "temario": "A2",
+   "bloque": "I",
+   "num": 7,
+   "title": "La protección de datos personales y su régimen jurídico: principios, derechos, responsable y encargado del tratamiento, delegado y autoridades de protección de datos. Derechos digitales.",
+   "files": [
+    "Bloque 1/Tema 7 - La protección de datos personales y su régimen jurídico principios, derechos, responsable y encargado del tratamiento, delegado y autoridades de protección de datos. Derechos digitales..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-I-08",
+   "temario": "A2",
+   "bloque": "I",
+   "num": 8,
+   "title": "Las Leyes de Procedimiento Administrativo Común de las Administraciones Públicas y de Régimen Jurídico del Sector Público. El texto refundido del Estatuto Básico del Empleo Público.",
+   "files": [
+    "Bloque 1/Tema 8 - Las Leyes de Procedimiento Administrativo Común de las Administraciones Públicas y de Régimen Jurídico del Sector Público. El texto refundido del Estatuto Básico del Empleo Público._ocred.pdf",
+    "Bloque 1/Tema 8 - Las Leyes de Procedimiento Administrativo Común de las Administraciones Públicas y de Régimen Jurídico del Sector Público. El texto refundido del Estatuto Básico del Empleo Público..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-I-09",
+   "temario": "A2",
+   "bloque": "I",
+   "num": 9,
+   "title": "Instrumentos para el acceso electrónico a las Administraciones públicas: sedes electrónicas, canales y punto de acceso, identificación y autenticación. Datos abiertos. Normativa vigente de reutilización.",
+   "files": [
+    "Tema 9 - Instrumentos para el acceso electrónico a las Administraciones públicas sedes electrónicas, canales y punto de acceso, identificación y autenticación. Datos abiertos. Normativa vigente de re.pdf",
+    "Bloque 1/Tema 9 - Instrumentos para el acceso electrónico a las Administraciones públicas sedes electrónicas, canales y punto de acceso, identificación y autenticación. Datos abiertos. Normativa vigente de re.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-I-10",
+   "temario": "A2",
+   "bloque": "I",
+   "num": 10,
+   "title": "Instrumentos y órganos para la cooperación entre Administraciones públicas en materia de Administración electrónica. Infraestructuras y servicios comunes. Plataformas de validación e intercambio.",
+   "files": [
+    "Bloque 1/Tema 10 - Instrumentos y órganos para la cooperación entre Administraciones públicas en materia de Administración electrónica. Infraestructuras y servicios comunes. Plataformas de validación e interc.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-01",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 1,
+   "title": "Tecnologías actuales de ordenadores: de los dispositivos móviles a los superordenadores y arquitecturas escalables y de altas prestaciones. Computación en la nube. Base tecnológica. Componentes.",
+   "files": [
+    "Bloque 2/Tema 1 - Tecnologías actuales de ordenadores de los dispositivos móviles a los superordenadores y arquitecturas escalables y de altas prestaciones. Computación en la nube. Base tecnológica. Component.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-02",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 2,
+   "title": "Conceptos y fundamentos de los sistemas operativos. Características técnicas, funcionales y de administración: Windows, Linux, Unix y otros. Sistemas operativos para dispositivos móviles.",
+   "files": [
+    "Tema 2 - Conceptos y fundamentos de los sistemas operativos. Características técnicas, funcionales y de administración Windows, Linux, Unix y otros. Sistemas operativos para dispositivos móviles..pdf",
+    "Bloque 2/Tema 2 - Conceptos y fundamentos de los sistemas operativos. Características técnicas, funcionales y de administración Windows, Linux, Unix y otros. Sistemas operativos para dispositivos móviles..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-03",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 3,
+   "title": "Características técnicas de los lenguajes y paradigmas actuales de programación.",
+   "files": [
+    "Bloque 2/Tema 3 - Características técnicas de los lenguajes y paradigmas actuales de programación..pdf"
+   ],
+   "kind": "tema",
+   "resumen": "Resumenes/BII.T3.pdf"
+  },
+  {
+   "id": "A2-II-04",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 4,
+   "title": "Inteligencia de negocios: cuadros de mando integral, sistemas de soporte a las decisiones, sistemas de información ejecutiva y almacenes de datos. OLTP y OLAP.",
+   "files": [
+    "Bloque 2/Tema 4 - Inteligencia de negocios cuadros de mando integral, sistemas de soporte a las decisiones, sistemas de información ejecutiva y almacenes de datos. OLTP y OLAP..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-05",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 5,
+   "title": "La arquitectura ANSI/SPARC. Sistemas de gestión de bases de datos relacionales. El lenguaje SQL. Normas y estándares para la interoperabilidad entre gestores de bases de datos relacionales.",
+   "files": [
+    "Bloque 2/Tema 5 - La arquitectura ANSISPARC. Sistemas de gestión de bases de datos relacionales. El lenguaje SQL. Normas y estándares para la interoperabilidad entre gestores de bases de datos relacionales..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-06",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 6,
+   "title": "Arquitectura de sistemas cliente-servidor, multicapas y multidispositivo: tipología. Componentes. Interoperabilidad de componentes. Ventajas e inconvenientes. Arquitectura de servicios web.",
+   "files": [
+    "Bloque 2/Tema 6 - Arquitectura de sistemas cliente-servidor, multicapas y multidispositivo tipología. Componentes. Interoperabilidad de componentes. Ventajas e inconvenientes. Arquitectura de servicios web..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-07",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 7,
+   "title": "Modelo de desarrollo de aplicaciones basado en contenedores y microservicios. Arquitectura y soluciones. Despliegue, monitorización y escalado.",
+   "files": [
+    "Bloque 2/Tema 7 - Modelo de desarrollo de aplicaciones basado en contenedores y microservicios. Arquitectura y soluciones. Despliegue, monitorización y escalado..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-08",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 8,
+   "title": "El modelo TCP/IP y el modelo de referencia de interconexión de sistemas abiertos (OSI) de ISO: arquitectura, capas, interfaces, protocolos, direccionamiento y encaminamiento.",
+   "files": [
+    "Bloque 2/Tema 8 - El modelo TCPIP y el modelo de referencia de interconexión de sistemas abiertos (OSI) de ISO arquitectura, capas, interfaces, protocolos, direccionamiento y encaminamiento..pdf"
+   ],
+   "kind": "tema",
+   "resumen": "Resumenes/BII.T8.pdf"
+  },
+  {
+   "id": "A2-II-09",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 9,
+   "title": "Lenguajes de marca o etiqueta. Características y funcionalidades. SGML, HTML, XML y sus derivaciones. Lenguajes de script.",
+   "files": [
+    "Bloque 2/Tema 9 - Lenguajes de marca o etiqueta. Características y funcionalidades. SGML, HTML, XML y sus derivaciones. Lenguajes de script..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-10",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 10,
+   "title": "Análisis y gestión de riesgos de los sistemas de información. Herramientas.",
+   "files": [
+    "Bloque 2/Tema 10 - Análisis y gestión de riesgos de los sistemas de información. Herramientas..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-11",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 11,
+   "title": "Auditoría Informática: objetivos, alcance y metodología. Técnicas y herramientas. Normas y estándares. Auditoría del ENS y de protección de datos. Auditoría de seguridad física.",
+   "files": [
+    "Bloque 2/Tema 11 - Auditoría Informática objetivos, alcance y metodología. Técnicas y herramientas. Normas y estándares. Auditoría del ENS y de protección de datos. Auditoría de seguridad física..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-12",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 12,
+   "title": "Gestión de la atención a clientes y usuarios: centros de contacto, CRM. Arquitectura multicanal. Sistemas de respuesta de voz interactiva (IVR). Voice XML.",
+   "files": [
+    "Bloque 2/Tema 12 - Gestión de la atención a clientes y usuarios centros de contacto, CRM. Arquitectura multicanal. Sistemas de respuesta de voz interactiva (IVR). Voice XML..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-13",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 13,
+   "title": "Seguridad física y lógica de un sistema de información. Herramientas en ciberseguridad. Gestión de incidentes. Informática forense.",
+   "files": [
+    "Bloque 2/Tema 13 - Seguridad física y lógica de un sistema de información. Herramientas en ciberseguridad. Gestión de incidentes. Informática forense..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-14",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 14,
+   "title": "Software libre y software propietario. Características y tipos de licencias. La protección jurídica de los programas de ordenador. Tecnologías de protección de derechos digitales.",
+   "files": [
+    "Bloque 2/Tema 14 - Software libre y software propietario. Características y tipos de licencias. La protección jurídica de los programas de ordenador. Tecnologías de protección de derechos digitales_.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-15",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 15,
+   "title": "Técnicas de evaluación de alternativas y análisis de viabilidad. Planificación, presupuestación y control de costes de un proyecto informático.",
+   "files": [
+    "Bloque 2/Tema 15 - Técnicas de evaluación de alternativas y análisis de viabilidad. Planificación, presupuestación y control de costes de un proyecto informático..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-II-16",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 16,
+   "title": "Sistemas de gestión documental y de contenidos. Sindicación de contenido. Sistemas de gestión de flujos de trabajos. Búsqueda de información: robots, spiders, otros. Posicionamiento y buscadores (SEO).",
+   "files": [
+    "Bloque 2/Tema 16 - Sistemas de gestión documental y de contenidos. Sindicación de contenido. Sistemas de gestión de flujos de trabajos. Búsqueda de información robots, spiders, otros. Posicionamiento y buscad.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-01",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 1,
+   "title": "Concepto del ciclo de vida de los sistemas y fases. Modelos de ciclo de vida.",
+   "files": [
+    "Bloque 3/Tema 1 - Concepto del ciclo de vida de los sistemas y fases. Modelos de ciclo de vida..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-02",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 2,
+   "title": "Gestión y planificación del proceso de desarrollo. Técnicas y prácticas de gestión y planificación de proyectos. Metodologías de desarrollo. La metodología Métrica.",
+   "files": [
+    "Bloque 3/Tema 2 - Gestión y planificación del proceso de desarrollo. Técnicas y prácticas de gestión y planificación de proyectos. Metodologías de desarrollo. La metodología Métrica..pdf"
+   ],
+   "kind": "tema",
+   "resumen": "Resumenes/BIII.T2.pdf"
+  },
+  {
+   "id": "A2-III-03",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 3,
+   "title": "Estrategias de determinación de requerimientos: entrevistas, derivación de sistemas existentes, análisis y prototipos. La especificación de requisitos de software.",
+   "files": [
+    "Bloque 3/Tema 3 - Estrategias de determinación de requerimientos entrevistas, derivación de sistemas existentes, análisis y prototipos. La especificación de requisitos de software..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-04",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 4,
+   "title": "Modelado de datos y metodologías. Diseño de bases de datos. El modelo lógico relacional. Normalización. Diseño lógico y físico. Problemas de concurrencia de acceso. Mecanismos de resolución de conflictos.",
+   "files": [
+    "Bloque 3/Tema 4 - Modelado de datos y metodologías. Diseño de bases de datos. El modelo lógico relacional. Normalización. Diseño lógico y físico. Problemas de concurrencia de acceso. Mecanismos de resolución.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-05",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 5,
+   "title": "Tipos abstractos de datos y estructuras de datos. Organizaciones de ficheros. Estrategias de diseño de algoritmos. Tipos de algoritmos: ordenación y búsqueda. Fundamentos de Inteligencia Artificial.",
+   "files": [
+    "Bloque 3/Tema 5 - Tipos abstractos de datos y estructuras de datos. Organizaciones de ficheros. Estrategias de diseño de algoritmos. Tipos de algoritmos ordenación y búsqueda. Fundamentos de Inteligencia Artificial,.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-06",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 6,
+   "title": "Construcción del sistema. Entornos de construcción y generación de código. Despliegue de aplicaciones e integración continua. Dev-Ops. Estándares de documentación. Manuales de usuario y manuales técnicos.",
+   "files": [
+    "Bloque 3/Tema 6 - Construcción del sistema. Entornos de construcción y generación de código. Despliegue de aplicaciones e integración continua. Dev-Ops. Estándares de documentación. Manuales de usuario y manu.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-07",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 7,
+   "title": "Pruebas. Planificación y documentación. Utilización de datos de prueba. Pruebas de software, hardware, procedimientos y datos.",
+   "files": [
+    "Bloque 3/Tema 7 - Pruebas. Planificación y documentación. Utilización de datos de prueba. Pruebas de software, hardware, procedimientos y datos..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-08",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 8,
+   "title": "Instalación y cambio. Estrategias de sustitución. Recepción e instalación. Evaluación post-implementación. Mantenimiento.",
+   "files": [
+    "Bloque 3/Tema 8 - Instalación y cambio. Estrategias de sustitución. Recepción e instalación. Evaluación post-implementación. Mantenimiento..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-09",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 9,
+   "title": "Análisis y diseño orientado a objetos. Elementos. El proceso unificado de software. El lenguaje de modelado unificado (UML). Patrones de diseño.",
+   "files": [
+    "Bloque 3/Tema 9 - Análisis y diseño orientado a objetos. Elementos. El proceso unificado de software. El lenguaje de modelado unificado (UML). Patrones de diseño..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-10",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 10,
+   "title": "La arquitectura Java EE/Jakarta EE. Características de funcionamiento. Elementos constitutivos. Productos y herramientas. Persistencia. Seguridad.",
+   "files": [
+    "Bloque 3/Tema 10 - La arquitectura Java EEJakarta EE. Características de funcionamiento. Elementos constitutivos. Productos y herramientas. Persistencia. Seguridad..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-11",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 11,
+   "title": "La plataforma .NET. Modelo de programación. Servicios. Herramientas. Persistencia. Seguridad.",
+   "files": [
+    "Bloque 3/Tema 11 - La plataforma.NET. Modelo de programación. Servicios. Herramientas. Persistencia. Seguridad..pdf"
+   ],
+   "kind": "tema",
+   "resumen": "Resumenes/BIII.T11.pdf"
+  },
+  {
+   "id": "A2-III-12",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 12,
+   "title": "Aplicaciones web. Diseño web multiplataforma/multidispositivo. Desarrollo web front-end y en servidor. Componentes de tecnologías de programación. Servicios web: estándares, protocolos asociados.",
+   "files": [
+    "Bloque 3/Tema 12 - Aplicaciones web. Diseño web multiplataformamultidispositivo. Desarrollo web front-end y en servidor. Componentes de tecnologías de programación. Servicios web estándares, protocolos asocia.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-13",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 13,
+   "title": "La calidad del software y su medida. Modelos, métricas, normas y estándares.",
+   "files": [
+    "Bloque 3/Tema 13 - La calidad del software y su medida. Modelos, métricas, normas y estándares..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-14",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 14,
+   "title": "Accesibilidad, diseño universal y usabilidad. Accesibilidad y usabilidad de las tecnologías, productos y servicios relacionados con la sociedad de la información. Experiencia de Usuario (UX).",
+   "files": [
+    "Tema 14 - Accesibilidad, diseño universal y usabilidad. Accesibilidad y usabilidad de las tecnologías, productos y servicios relacionados con la sociedad de la información. Experiencia de Usuario o U.pdf",
+    "Bloque 3/Tema 14 - Accesibilidad, diseño universal y usabilidad. Accesibilidad y usabilidad de las tecnologías, productos y servicios relacionados con la sociedad de la información. Experiencia de Usuario o U.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-III-15",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 15,
+   "title": "Minería de datos. Aplicación a la resolución de problemas de gestión. Tecnología y algoritmos. Procesamiento analítico en línea (OLAP). Big data. Entornos Hadoop o similares. Bases de datos NoSQL.",
+   "files": [
+    "Bloque 3/Tema 15 - Minería de datos. Aplicación a la resolución de problemas de gestión. Tecnología y algoritmos. Procesamiento analítico en línea (OLAP). Big data. Entornos Hadoop o similares. Bases de datos.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-01",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 1,
+   "title": "Administración del Sistema operativo y software de base.",
+   "files": [
+    "Bloque 4/Tema 1 - Administración del Sistema operativo y software de base..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-02",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 2,
+   "title": "Administración de sistemas de gestión de bases de datos.",
+   "files": [
+    "Bloque 4/Tema 2 - Administración de sistemas de gestión de bases de datos..pdf"
+   ],
+   "kind": "tema",
+   "resumen": "Resumenes/BIV.T2.pdf"
+  },
+  {
+   "id": "A2-IV-03",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 3,
+   "title": "Mantenimiento de equipos e instalaciones. Tipos de mantenimiento. Gestión de incidencias. Procedimientos de backup y recuperación.",
+   "files": [
+    "Bloque 4/Tema 3 - Mantenimiento de equipos e instalaciones. Tipos de mantenimiento. Gestión de incidencias. Procedimientos de backup y recuperación..pdf"
+   ],
+   "kind": "tema",
+   "resumen": "Resumenes/BIV.T3.pdf"
+  },
+  {
+   "id": "A2-IV-04",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 4,
+   "title": "Gestión de la configuración. Control de cambios y de versiones. Técnicas y herramientas de operación automática. Evaluación y monitorización del rendimiento de sistemas, infraestructuras y servicios.",
+   "files": [
+    "Bloque 4/Tema 4 - Gestión de la configuración. Control de cambios y de versiones. Técnicas y herramientas de operación automática. Evaluación y monitorización del rendimiento de sistemas, infraestructuras y s.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-05",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 5,
+   "title": "Almacenamiento de datos: arquitectura, tipos, componentes, protocolos, gestión y administración. Virtualización del almacenamiento.",
+   "files": [
+    "Bloque 4/Tema 5 - Almacenamiento de datos arquitectura, tipos, componentes, protocolos, gestión y administración. Virtualización del almacenamiento..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-06",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 6,
+   "title": "Planificación física y dimensionamiento de un centro de procesamiento de datos. Virtualización y consolidación de servidores y recursos. Vulnerabilidades, riesgo y protección. Sistemas de alta disponibilidad.",
+   "files": [
+    "Bloque 4/Tema 6 - Planificación física y dimensionamiento de un centro de procesamiento de datos. Virtualización y consolidación de servidores y recursos. Vulnerabilidades, riesgo y protección. Sistemas de al.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-07",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 7,
+   "title": "Medios de transmisión guiados y no guiados (inalámbricos): tipos y parámetros significativos. Elementos de cableado estructurado.",
+   "files": [
+    "Bloque 4/Tema 7 - Medios de transmisión guiados y no guiados (inalámbricos) tipos y parámetros significativos. Elementos de cableado estructurado..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-08",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 8,
+   "title": "Redes locales. Tipología, protocolos y técnicas de transmisión. Métodos de acceso. Dispositivos de interconexión. Seguridad. Normativa Reguladora.",
+   "files": [
+    "Bloque 4/Tema 8 - Redes locales. Tipología, protocolos y técnicas de transmisión. Métodos de acceso. Dispositivos de interconexión. Seguridad. Normativa Reguladora..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-09",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 9,
+   "title": "Administración de redes locales. Gestión de usuarios y dispositivos. Monitorización y control de tráfico. Gestión SNMP.",
+   "files": [
+    "Bloque 4/Tema 9 - Administración de redes locales. Gestión de usuarios y dispositivos. Monitorización y control de tráfico. Gestión SNMP..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-10",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 10,
+   "title": "Redes de área extensa. Tecnologías WDM y MPLS. SD-WAN. Protocolos de encaminamiento.",
+   "files": [
+    "Bloque 4/Tema 10 - Redes de área extensa. Tecnologías WDM y MPLS SD-WAN. Protocolos de encaminamiento..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-11",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 11,
+   "title": "Redes inalámbricas. Protocolos. Características funcionales y técnicas. Sistemas de expansión del espectro. Sistemas de acceso. Modos de operación. Seguridad. Normativa reguladora.",
+   "files": [
+    "Bloque 4/Tema 11 - Redes inalámbricas. Protocolos. Características funcionales y técnicas. Sistemas de expansión del espectro. Sistemas de acceso. Modos de operación. Seguridad. Normativa reguladora..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-12",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 12,
+   "title": "La seguridad en redes. Seguridad perimetral. Control de accesos. Técnicas criptográficas y protocolos seguros. Mecanismos de firma digital. Redes privadas virtuales. Seguridad en el puesto del usuario.",
+   "files": [
+    "Bloque 4/Tema 12 - La seguridad en redes. Seguridad perimetral. Control de accesos. Técnicas criptográficas y protocolos seguros. Mecanismos de firma digital. Redes privadas virtuales. Seguridad en el puesto del usu.pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-13",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 13,
+   "title": "La red Internet: arquitectura de red. Principios de funcionamiento. Servicios: evolución, estado actual y perspectivas de futuro. Internet de las Cosas (IoT).",
+   "files": [
+    "Bloque 4/Tema 13 - La red Internet arquitectura de red. Principios de funcionamiento. Servicios evolución, estado actual y perspectivas de futuro. Internet de las Cosas (IoT)..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-14",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 14,
+   "title": "Redes de nueva generación y servicios convergentes (NGN/IMS). VoIP, ToIP y comunicaciones unificadas. Convergencia telefonía fija-telefonía móvil.",
+   "files": [
+    "Bloque 4/Tema 14 - Redes de nueva generación y servicios convergentes (NGNIMS). VoIP, ToIP y comunicaciones unificadas. Convergencia telefonía fija-telefonía móvil..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-15",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 15,
+   "title": "Sistemas de comunicaciones móviles. Generaciones de tecnologías de telefonía móvil. Soluciones de gestión de dispositivos móviles (MDM, EMM, UEM).",
+   "files": [
+    "Bloque 4/Tema 15 - Sistemas de comunicaciones móviles. Generaciones de tecnologías de telefonía móvil. Soluciones de gestión de dispositivos móviles (MDM, EMM, UEM)..pdf"
+   ],
+   "kind": "tema"
+  },
+  {
+   "id": "A2-IV-16",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 16,
+   "title": "Sistemas de videoconferencia. Protocolos. Dimensionamiento y calidad de servicio en las comunicaciones y acondicionamiento de salas y equipos.",
+   "files": [
+    "Bloque 4/Tema 16 - Sistemas de videoconferencia. Protocolos. Dimensionamiento y calidad de servicio en las comunicaciones y acondicionamiento de salas y equipos..pdf"
+   ],
+   "kind": "tema",
+   "resumen": "Resumenes/BIV.T16.pdf"
+  },
+  {
+   "id": "A2-X-NOM1",
+   "temario": "A2",
+   "bloque": "I",
+   "num": 0,
+   "title": "Nomenclaturas del Bloque I",
+   "files": [
+    "Bloque 1/Nomenclaturas .pdf"
+   ],
+   "kind": "extra"
+  },
+  {
+   "id": "A2-X-NOM2",
+   "temario": "A2",
+   "bloque": "II",
+   "num": 0,
+   "title": "Nomenclaturas del Bloque II",
+   "files": [
+    "Bloque 2/Nomenclaturas.pdf"
+   ],
+   "kind": "extra"
+  },
+  {
+   "id": "A2-X-NOM3",
+   "temario": "A2",
+   "bloque": "III",
+   "num": 0,
+   "title": "Nomenclaturas del Bloque III",
+   "files": [
+    "Bloque 3/Nomenclaturas.pdf"
+   ],
+   "kind": "extra"
+  },
+  {
+   "id": "A2-X-NOM4",
+   "temario": "A2",
+   "bloque": "IV",
+   "num": 0,
+   "title": "Nomenclaturas del Bloque IV",
+   "files": [
+    "Bloque 4/Nomenclaturas.pdf"
+   ],
+   "kind": "extra"
+  },
+  {
+   "id": "A2-X-SUP",
+   "temario": "A2",
+   "bloque": "Otros",
+   "num": 0,
+   "title": "Consejos para el supuesto práctico",
+   "files": [
+    "Consejos supuesto.pdf"
+   ],
+   "kind": "extra"
+  },
+  {
+   "id": "A2-X-ORG",
+   "temario": "A2",
+   "bloque": "Otros",
+   "num": 0,
+   "title": "Organismos de estandarización",
+   "files": [
+    "Organismos de estandarización .pdf"
+   ],
+   "kind": "extra"
+  }
+ ],
+ "p2a1": {
+  "1": 1,
+  "2": 2,
+  "3": 3,
+  "4": 4,
+  "5": 5,
+  "6": 6,
+  "7": 7,
+  "8": 8,
+  "9": 9,
+  "10": 10,
+  "11": 11,
+  "12": 12,
+  "13": 13,
+  "14": 14,
+  "15": 15,
+  "16": 16,
+  "17": 17,
+  "18": 18,
+  "19": 19,
+  "20": 20,
+  "21": 21,
+  "22": 22,
+  "23": 23,
+  "24": 24,
+  "25": 25,
+  "26": 26,
+  "27": 27,
+  "28": 28,
+  "29": 29,
+  "30": 30,
+  "31": 31,
+  "32": 32,
+  "33": 33,
+  "34": 34,
+  "35": 35,
+  "36": 36,
+  "37": 37,
+  "38": 38,
+  "39": 39,
+  "40": 40,
+  "41": 41,
+  "42": 42,
+  "43": 43,
+  "44": 44,
+  "45": 45,
+  "46": 46,
+  "47": 47,
+  "48": 48,
+  "49": 49,
+  "50": 50,
+  "51": 51,
+  "52": 52,
+  "53": 53,
+  "54": 54,
+  "55": 55,
+  "56": 56,
+  "57": 57,
+  "58": 58,
+  "59": 59,
+  "60": 60,
+  "61": 61,
+  "62": 62,
+  "63": 63,
+  "64": 64,
+  "65": 65,
+  "66": 66,
+  "67": 67,
+  "68": 68,
+  "69": 69,
+  "70": 70,
+  "71": 71,
+  "72": 72,
+  "73": 73,
+  "74": 74,
+  "75": 75,
+  "76": 76,
+  "77": 77,
+  "78": 78,
+  "79": 79,
+  "80": 80,
+  "81": 81,
+  "82": 82,
+  "83": 83,
+  "84": 84,
+  "85": null,
+  "86": 85,
+  "87": 86,
+  "88": 87,
+  "89": 88,
+  "90": 89,
+  "91": 90,
+  "92": 91,
+  "93": 92,
+  "94": 93,
+  "95": 94,
+  "96": 95,
+  "97": 96,
+  "98": 97,
+  "99": 98,
+  "100": 99,
+  "101": 100,
+  "102": 101,
+  "103": 102,
+  "104": 103,
+  "105": 104,
+  "106": 105,
+  "107": 106,
+  "108": 107,
+  "109": 108,
+  "110": 109,
+  "111": 110,
+  "112": 111,
+  "113": 112,
+  "114": 113,
+  "115": 114,
+  "116": 115,
+  "117": 116,
+  "118": 117,
+  "119": 118,
+  "120": 119,
+  "121": 120,
+  "122": 121,
+  "123": 122,
+  "124": 123,
+  "125": 124,
+  "126": 125,
+  "127": 126,
+  "128": 127,
+  "129": 128,
+  "130": 129,
+  "131": 130,
+  "132": 131,
+  "133": 132
+ },
+ "p2a2": {
+  "1": "A2-I-01",
+  "2": "A2-I-02",
+  "4": "A2-I-03",
+  "7": "A2-I-08",
+  "8": "A2-I-08",
+  "9": "A2-I-08",
+  "10": "A2-I-08",
+  "13": "A2-I-08",
+  "16": "A2-I-05",
+  "18": "A2-I-06",
+  "24": "A2-I-08",
+  "25": "A2-I-04",
+  "27": "A2-I-07",
+  "31": "A2-I-09",
+  "35": "A2-III-02",
+  "36": "A2-III-02",
+  "37": "A2-III-02",
+  "38": "A2-II-11",
+  "40": "A2-II-15",
+  "41": "A2-II-15",
+  "42": "A2-II-15",
+  "43": "A2-II-14",
+  "44": "A2-III-14",
+  "45": "A2-I-10",
+  "46": "A2-I-10",
+  "47": "A2-II-10",
+  "48": "A2-II-13",
+  "49": "A2-I-10",
+  "51": "A2-I-06",
+  "52": "A2-II-01",
+  "53": "A2-II-01",
+  "54": "A2-II-01",
+  "55": "A2-II-01",
+  "56": "A2-IV-05",
+  "57": "A2-II-06",
+  "58": "A2-II-06",
+  "59": "A2-II-02",
+  "60": "A2-II-02",
+  "61": "A2-II-02",
+  "62": "A2-II-02",
+  "63": "A2-II-05",
+  "64": "A2-II-05",
+  "65": "A2-III-12",
+  "66": "A2-III-11",
+  "67": "A2-III-10",
+  "68": "A2-II-03",
+  "69": "A2-II-14",
+  "70": "A2-III-05",
+  "71": "A2-III-15",
+  "72": "A2-II-12",
+  "75": "A2-II-04",
+  "76": "A2-III-15",
+  "77": "A2-II-09",
+  "79": "A2-IV-12",
+  "80": "A2-I-06",
+  "81": "A2-I-06",
+  "82": "A2-I-07",
+  "86": "A2-III-01",
+  "88": "A2-III-03",
+  "89": "A2-III-04",
+  "90": "A2-III-09",
+  "91": "A2-III-03",
+  "92": "A2-II-06",
+  "93": "A2-III-09",
+  "94": "A2-III-03",
+  "95": "A2-III-02",
+  "96": "A2-III-07",
+  "97": "A2-III-06",
+  "98": "A2-III-13",
+  "99": "A2-II-15",
+  "100": "A2-III-08",
+  "101": "A2-III-08",
+  "102": "A2-IV-04",
+  "104": "A2-II-16",
+  "105": "A2-II-16",
+  "108": "A2-IV-07",
+  "109": "A2-IV-13",
+  "110": "A2-IV-07",
+  "111": "A2-II-08",
+  "112": "A2-IV-10",
+  "113": "A2-IV-10",
+  "114": "A2-IV-11",
+  "115": "A2-IV-10",
+  "116": "A2-IV-14",
+  "117": "A2-IV-13",
+  "118": "A2-IV-08",
+  "119": "A2-IV-08",
+  "120": "A2-IV-10",
+  "123": "A2-IV-15",
+  "124": "A2-IV-15",
+  "125": "A2-IV-12",
+  "126": "A2-IV-12",
+  "127": "A2-II-13",
+  "128": "A2-IV-03",
+  "130": "A2-IV-16",
+  "131": "A2-IV-12",
+  "132": "A2-IV-06"
+ },
+ "pdesc": {
+  "1": "Constitución Española (I).",
+  "2": "Constitución Española (II). Poder Judicial",
+  "3": "Constitución Española (III). Organización Territorial",
+  "4": "Constitución Española (IV). Administración",
+  "5": "Unión Europea",
+  "6": "Organización territorial de la AGE.",
+  "7": "Fuentes del Derecho Administrativo",
+  "8": "Régimen jurídico de las AAPP. Procedimiento administrativo.",
+  "9": "Revisión de los actos en vía administrativa. Recursos",
+  "10": "La responsabilidad patrimonial de las Administraciones Públicas.",
+  "11": "Los contratos de las Administraciones Públicas.",
+  "12": "Los presupuestos generales del Estado.",
+  "13": "Convenios. Encomiendas de gestión. Colaboración público-privada",
+  "14": "El modelo económico español.",
+  "15": "Los sectores de la economía.",
+  "16": "Estructura social y políticas de igualdad.",
+  "17": "El mercado de trabajo.",
+  "18": "TIC y sociedad.",
+  "19": "TIC, economía y mercado de trabajo.",
+  "20": "La función gerencial de las AAPP.",
+  "21": "Gestión de equipos.",
+  "22": "La calidad en los servicios públicos.",
+  "23": "Modelo burocrático, management y gobernanza.",
+  "24": "Empleo Público",
+  "25": "Gobernanza, Gobierno Abierto y Transparencia ",
+  "26": "Emprendimiento y unidad de mercado.",
+  "27": "Protección de Datos",
+  "28": "Conceptos de sistemas de información.",
+  "29": "La información en las organizaciones.",
+  "30": "Gobernanza TIC.",
+  "31": "Reutilización de la información del sector público.",
+  "32": "Directivo TIC.",
+  "33": "Herramientas para el directivo TIC.",
+  "34": "Centro de sistemas de información.",
+  "35": "Dirección y gestión de proyectos TIC.",
+  "36": "Metodologías predictivas para la gestión de proyectos.",
+  "37": "Metodologías lean.",
+  "38": "Auditoría informática.",
+  "39": "Ley de contratos.",
+  "40": "Adquisición de sistemas.",
+  "41": "Alternativas de decisión.",
+  "42": "Rentabilidad de las inversiones.",
+  "43": "Protección jurídica del software.",
+  "44": "Accesibilidad y usabilidad.",
+  "45": "ENI",
+  "46": "NTI",
+  "47": "Análisis y gestión de riesgos.",
+  "48": "ENS.",
+  "49": "Infraestructuras y servicios comunes.",
+  "50": "Organizaciónes de normalización.",
+  "51": "Agenda Digital para España. Mercado Único Digital",
+  "52": "Sistemas de altas prestaciones.",
+  "53": "Equipos departamentales y servidores.",
+  "54": "Dispositivos personales y móviles.",
+  "55": "Cloud computing.",
+  "56": "Sistemas de almacenamiento.",
+  "57": "Sistemas de información multiusuario.",
+  "58": "Arquitectura SOA.",
+  "59": "Sistemas Operativos.",
+  "60": "UNIX-LINUX.",
+  "61": "Microsoft.",
+  "62": "Sistemas Operativos para móviles.",
+  "63": "Sistemas de gestión de bases de datos.",
+  "64": "El modelo relacional.",
+  "65": "Arquitectura de desarrollo en la web.",
+  "66": "Entorno de desarrollo Microsoft.NET.",
+  "67": "Entorno de desarrollo JAVA.",
+  "68": "Entorno de desarrollo PHP.",
+  "69": "Software de código abierto y libre.",
+  "70": "Inteligencia artificial.",
+  "71": "Big Data.",
+  "72": "Sistemas CRM y ERP.",
+  "73": "E-learning.",
+  "74": "Los sistemas GIS.",
+  "75": "Datawarehouse y minería de datos.",
+  "76": "Estrategia del dato.",
+  "77": "Lenguajes de marcado.",
+  "78": "Comercio electrónico.",
+  "79": "El cifrado.",
+  "80": "Identificación y firma electrónica I.",
+  "81": "Identificación y firma electrónica II.",
+  "82": "Adaptación LOPD.",
+  "83": "El tratamiento de imágenes.",
+  "84": "Reconocimiento óptico de caracteres.",
+  "85": "Blockchain.",
+  "86": "Modelos de ciclo de vida.",
+  "87": "Plan de sistemas de información.",
+  "88": "Análisis de sistemas y metodologías ágiles.",
+  "89": "Análisis del dominio de los sistemas.",
+  "90": "Análisis dinámico de sistemas.",
+  "91": "Análisis de aspectos no funcionales.",
+  "92": "Diseño arquitectónico de sistemas.",
+  "93": "Técnicas de diseño de software.",
+  "94": "Prototipos en el desarrollo de sistemas.",
+  "95": "Metrica",
+  "96": "Pruebas de software.",
+  "97": "Integración Continua.",
+  "98": "Evaluación de la calidad del software.",
+  "99": "Estimación de recursos.",
+  "100": "Migración de aplicaciones y ajuste dimensional.",
+  "101": "Mantenimiento de sistemas.",
+  "102": "Gestión de cambios",
+  "103": "Calidad de los servicios.",
+  "104": "Gestión documental.",
+  "105": "Sistemas de recuperación de la información.",
+  "106": "ITIL y COBIT.",
+  "107": "Tecnologías emergentes.",
+  "108": "Redes de telecomunicaciones.",
+  "109": "Internet.",
+  "110": "Cableado.",
+  "111": "Modelo OSI.",
+  "112": "Tecnologías de acceso.",
+  "113": "Redes de transporte.",
+  "114": "Redes inalámbricas.",
+  "115": "Redes IP.",
+  "116": "Redes de nueva generación.",
+  "117": "Transformación digital.",
+  "118": "Redes de área local.",
+  "119": "Intranet y extranet.",
+  "120": "Redes públicas.",
+  "121": "CATV.",
+  "122": "Correo electrónico.",
+  "123": "Comunicaciones móviles.",
+  "124": "Aplicaciones móviles.",
+  "125": "Seguridad en redes.",
+  "126": "Seguridad en el nivel de aplicación.",
+  "127": "Ciberseguridad.",
+  "128": "Continuidad del Negocio.",
+  "129": "Regulación de las telecomunicaciones.",
+  "130": "Videoconferencia.",
+  "131": "Single sign-on.",
+  "132": "Virtualización de sistemas.",
+  "133": "Trabajo colaborativo y redes sociales."
+ }
+}
