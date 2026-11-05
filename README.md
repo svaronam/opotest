@@ -12,6 +12,23 @@ Plataforma de **tests de aprendizaje continuo** para las oposiciones TIC de la A
 - **Temario buscable**: indexación de PDFs, con OCR para los escaneados, procesado en segundo plano a baja prioridad.
 - **Estadísticas**: actividad diaria, temas más fallados, resultados por bloque y escala, rachas y franja horaria de mejor rendimiento.
 
+## Capturas
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/capturas/hoy.png" width="200" alt="Hoy: objetivo diario de preguntas y accesos rápidos a repaso, preguntas nuevas y test rápido"></td>
+    <td align="center"><img src="docs/capturas/test.png" width="200" alt="Nuevo test: filtros por temario, escala y origen, y generación de preguntas con IA"></td>
+    <td align="center"><img src="docs/capturas/pregunta.png" width="200" alt="Pregunta corregida con explicación y fuentes del temario, internet e IA"></td>
+    <td align="center"><img src="docs/capturas/repaso.png" width="200" alt="Repaso espaciado de las preguntas falladas"></td>
+  </tr>
+  <tr>
+    <td align="center">Hoy</td>
+    <td align="center">Nuevo test</td>
+    <td align="center">Pregunta corregida</td>
+    <td align="center">Repaso espaciado</td>
+  </tr>
+</table>
+
 ## Arquitectura
 
 ```
