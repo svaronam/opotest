@@ -966,6 +966,13 @@ route(/^\/ajustes$/, async () => {
 function applyTheme() {
   const t = LS.get("theme", "auto");
   if (t === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.dataset.theme = t;
+  // la APK pinta sus barras (estado y navegación) del mismo color que el fondo
+  if (isAndroid && window.Android.setBars) {
+    const bg = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim() || "#eef1f6";
+    const dark = t === "dark" || (t === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
+    try { window.Android.setBars(bg, dark); } catch (e) {}
+  }
 }
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme); } catch (e) {}
 applyTheme();
 render();

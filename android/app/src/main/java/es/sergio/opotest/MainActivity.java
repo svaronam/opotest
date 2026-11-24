@@ -21,6 +21,7 @@ import android.widget.FrameLayout;
 
 public class MainActivity extends Activity {
     private WebView web;
+    private FrameLayout root;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable foregroundPoll = new Runnable() {
         @Override public void run() {
@@ -38,12 +39,14 @@ public class MainActivity extends Activity {
             finish();
             return;
         }
-        FrameLayout root = new FrameLayout(this);
+        root = new FrameLayout(this);
         web = new WebView(this);
         root.addView(web);
         setContentView(root);
         // Android 15 dibuja bajo las barras del sistema: dejamos hueco para ellas y para el teclado
         if (Build.VERSION.SDK_INT >= 30) Insetter.apply(root);
+        // Colores de las barras del sistema: los últimos que pidió la web, para que no parpadee al abrir
+        applyBars(Prefs.sp(this).getInt("bar_color", 0xFFEEF1F6), Prefs.sp(this).getBoolean("bar_dark", false));
 
         WebSettings ws = web.getSettings();
         ws.setJavaScriptEnabled(true);
@@ -120,7 +123,32 @@ public class MainActivity extends Activity {
         });
     }
 
+    /** Pinta la barra de estado y la de navegación del color de fondo de la web. */
+    private void applyBars(int color, boolean dark) {
+        if (root != null) root.setBackgroundColor(color);
+        if (web != null) web.setBackgroundColor(color);
+        getWindow().setStatusBarColor(color);
+        getWindow().setNavigationBarColor(color);
+        if (Build.VERSION.SDK_INT >= 30) {
+            android.view.WindowInsetsController ic = getWindow().getInsetsController();
+            int light = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                    | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+            if (ic != null) ic.setSystemBarsAppearance(dark ? 0 : light, light);
+        } else {
+            android.view.View d = getWindow().getDecorView();
+            int f = d.getSystemUiVisibility();
+            int light = android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            d.setSystemUiVisibility(dark ? (f & ~light) : (f | light));
+        }
+    }
+
     final class Bridge {
+        @JavascriptInterface public void setBars(String hex, boolean dark) {
+            final int c;
+            try { c = android.graphics.Color.parseColor(hex.trim()); } catch (Exception e) { return; }
+            Prefs.sp(MainActivity.this).edit().putInt("bar_color", c).putBoolean("bar_dark", dark).apply();
+            runOnUiThread(() -> applyBars(c, dark));
+        }
         @JavascriptInterface public void openSettings() {
             startActivity(new Intent(MainActivity.this, SettingsActivity.class));
         }
@@ -131,6 +159,6 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void reload() {
             runOnUiThread(() -> web.loadUrl(Prefs.url(MainActivity.this) + "/"));
         }
-        @JavascriptInterface public String version() { return "1.1.0"; }
+        @JavascriptInterface public String version() { return "1.1.1"; }
     }
 }
