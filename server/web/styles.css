@@ -314,3 +314,20 @@ mark.ans { background: var(--ok-soft); color: var(--ok); font-weight: 700; box-s
 .flash.on { border-color: var(--ink-3); }
 .btn.ko { background: var(--ko); border-color: var(--ko); color: #fff; }
 .btn.okb { background: var(--ok); border-color: var(--ok); color: #fff; }
+
+/* ---- objetivo diario: anillo */
+.goalrow { display: flex; align-items: center; gap: 18px; }
+.ring { width: 92px; height: 92px; flex: none; }
+.ring circle { fill: none; stroke-width: 7; }
+.ring .trk { stroke: var(--line); }
+.ring .val { stroke: var(--guide); stroke-linecap: round; transition: stroke-dasharray .4s; }
+.goal.done .ring .val { stroke: var(--ok); }
+.ring .big { font-size: 22px; font-weight: 800; fill: var(--ink); }
+.ring .sm { font-size: 10px; fill: var(--ink-3); }
+.goalinfo { display: flex; flex-direction: column; gap: 3px; }
+.goalinfo b { font-size: 1.15rem; }
+.goalinfo span { font-size: .9rem; color: var(--ink-2); }
+.seq { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 14px; }
+.seq i { width: 8px; height: 14px; border-radius: 2px; }
+.seq i.ok { background: var(--ok); }
+.seq i.ko { background: var(--ko); }

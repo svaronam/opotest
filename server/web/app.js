@@ -136,21 +136,24 @@ route(/^\/$/, async () => {
   $app.innerHTML = topbar("Hoy") + loading();
   const d = await api("/home");
   const done = d.answered >= d.goal;
-  const slots = Math.max(d.goal, d.answered);
-  const seq = d.today_seq || "";
-  let bub = "";
-  for (let i = 0; i < Math.min(slots, 200); i++) {
-    const c = seq[i] === "1" ? "ok" : seq[i] === "0" ? "ko" : "";
-    bub += `<i class="${c} ${i >= d.goal ? "extra" : ""}"></i>`;
-  }
+  const seq = (d.today_seq || "").slice(-60);
+  const ringPct = Math.min(1, d.answered / Math.max(1, d.goal));
+  const R = 34, C = 2 * Math.PI * R;
   const pct = d.answered ? Math.round(100 * d.correct / d.answered) : null;
   const tem = d.temario || {};
   $app.innerHTML = topbar("Hoy", { right: `<a class="iconbtn" href="#/ajustes" aria-label="Ajustes">${ICON.gear}</a>` }) + `<main>
     <section class="sheet goal ${done ? "done" : ""}">
-      <div class="count">${d.answered} <small>de ${d.goal} preguntas</small></div>
-      <div class="bubbles" aria-hidden="true">${bub}</div>
-      <p class="small muted" style="margin:8px 0 0">${done ? "Mínimo diario cumplido." : `Te faltan ${d.goal - d.answered} para el mínimo de hoy.`}
-        ${pct != null ? ` Aciertas el ${pct}% hoy.` : ""} ${d.streak ? ` Racha: ${d.streak} día${d.streak > 1 ? "s" : ""}.` : ""}</p>
+      <div class="goalrow">
+        <svg class="ring" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="${R}" class="trk"/>
+          <circle cx="40" cy="40" r="${R}" class="val" stroke-dasharray="${(C * ringPct).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 40 40)"/>
+          <text x="40" y="38" text-anchor="middle" class="big">${d.answered}</text><text x="40" y="53" text-anchor="middle" class="sm">de ${d.goal}</text></svg>
+        <div class="goalinfo">
+          <b>${done ? "Mínimo cumplido" : `Te faltan ${d.goal - d.answered}`}</b>
+          <span>${pct != null ? `${pct}% de acierto hoy` : "Aún no has respondido hoy"}</span>
+          <span>${d.streak ? `Racha de ${d.streak} día${d.streak > 1 ? "s" : ""}` : "Sin racha todavía"}</span>
+        </div>
+      </div>
+      ${seq ? `<div class="seq" aria-label="Respuestas de hoy">${[...seq].map((c) => `<i class="${c === "1" ? "ok" : "ko"}"></i>`).join("")}</div>` : ""}
     </section>
     <section class="todo">
       ${d.open_test ? `<a href="#/t/${d.open_test.id}" class="hot"><span class="n">›</span><span class="t"><b>${d.open_test.kind === "simulacro" ? "Seguir con el simulacro" : "Seguir con el test"}</b><span>${esc(d.open_test.title)} · ${d.open_test.n} preguntas${d.open_test.kind === "simulacro" ? " · el tiempo corre" : ""}</span></span></a>` : ""}
