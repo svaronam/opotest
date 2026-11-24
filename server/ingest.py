@@ -16,6 +16,7 @@ import tempfile
 import time
 
 import db
+import spfiles
 
 MIN_CHARS = 80          # menos letras que esto en una página => se considera escaneada
 OCR_DPI = 170
@@ -89,6 +90,13 @@ def process_doc(doc, lang, force=False):
     if force:
         db.run("DELETE FROM pages WHERE doc_id=?", (doc["id"],))
         db.run("DELETE FROM pages_fts WHERE doc_id=?", (doc["id"],))
+    if os.path.splitext(path)[1].lower() in spfiles.TEXT_EXT:      # Word, PowerPoint o texto
+        pages = spfiles.split_pages(spfiles.file_text(path))
+        for i, t in enumerate(pages, 1):
+            save_page(doc["id"], 0, i, clean(t), 0)
+        db.run("UPDATE docs SET pages=?, status='ok', progress=100 WHERE id=?", (len(pages), doc["id"]))
+        log(f"{doc['id']} listo ({len(pages)} págs de texto)")
+        return
     n = pdf_pages(path)
     db.run("UPDATE docs SET pages=?, status='procesando', error=NULL WHERE id=?", (n, doc["id"]))
     done = {r["page"] for r in db.q("SELECT page FROM pages WHERE doc_id=? AND file_idx=0", (doc["id"],))}
@@ -122,12 +130,22 @@ def process_doc(doc, lang, force=False):
 
 def pending_docs():
     # primero el A1 (texto directo, rápido), luego A2 por bloques; los resúmenes manuscritos no se indexan
-    return db.q("""SELECT * FROM docs WHERE status NOT IN ('ok') AND kind IN ('tema','extra')
-                   ORDER BY CASE temario WHEN 'A1' THEN 0 ELSE 1 END, kind DESC, bloque, num""")
+    # los supuestos (SP) van antes que el A2 escaneado: son pocos y los usa el supuesto práctico
+    return db.q("""SELECT * FROM docs WHERE status NOT IN ('ok','error') AND (kind IN ('tema','extra') OR kind LIKE 'sp-%')
+                   ORDER BY CASE temario WHEN 'A1' THEN 0 WHEN 'SP' THEN 1 ELSE 2 END,
+                            CASE WHEN bloque='III' THEN 0 ELSE 1 END,
+                            CASE kind WHEN 'sp-real' THEN 0 WHEN 'sp-enun' THEN 1 WHEN 'sp-sol' THEN 2 WHEN 'sp-feedback' THEN 3 ELSE 4 END,
+                            kind DESC, bloque, num""")
 
 
 def run_once(only=None, force=False):
     db.init()
+    try:
+        n = spfiles.scan()
+        if n:
+            log(f"Carpeta de supuestos: {n} documentos")
+    except Exception as e:
+        log("ERROR registrando la carpeta de supuestos", e)
     lang = tesseract_lang()
     if not lang:
         log("AVISO: tesseract no está instalado; las páginas escaneadas quedarán sin texto")

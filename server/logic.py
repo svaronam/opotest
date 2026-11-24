@@ -50,9 +50,11 @@ def docs_tree():
                 x = acc.setdefault(d, [0, 0])
                 x[0] += r["ok"] or 0
                 x[1] += r["n"]
-    out = {"A1": [], "A2": []}
+    out = {"A1": [], "A2": [], "SP": []}
     for d in db.q("SELECT id,temario,bloque,num,title,kind,files,resumen,pages,status,progress FROM docs ORDER BY temario, bloque, num"):
         d["files"] = json.loads(d["files"])
+        if d["temario"] not in out:
+            continue
         d["questions"] = (counts_a1 if d["temario"] == "A1" else counts_a2).get(d["id"], 0)
         a = acc.get(d["id"])
         d["answered"] = a[1] if a else 0
@@ -68,6 +70,8 @@ def docs_tree():
 def _where(filters):
     f = filters or {}
     w, a = ["q.disabled=0"], []
+    if f.get("ley"):
+        w.append("q.law_id=?"); a.append(f["ley"])
     tem = f.get("temario")
     temas = f.get("temas") or []
     bloques = f.get("bloques") or []
@@ -164,7 +168,7 @@ def describe_filters(f):
 
 def public_q(qrow, reveal=False):
     d = {k: qrow.get(k) for k in ("id", "text", "a", "b", "c", "d", "origin", "block", "a1_doc", "a2_doc", "escala",
-                                   "is_exam", "year", "is_new", "rating")}
+                                   "is_exam", "year", "is_new", "rating", "law_id", "law_art")}
     d["comments"] = qrow.get("comments") if reveal else None
     if reveal:
         d["correct"] = eff(qrow)
@@ -381,6 +385,8 @@ def home():
         "total_questions": db.scalar("SELECT COUNT(*) FROM questions WHERE disabled=0"),
         "ia_questions": db.scalar("SELECT COUNT(*) FROM questions WHERE origin='ia' AND disabled=0"),
         "open_test": db.q1("SELECT id,title,n,kind FROM tests WHERE finished_at IS NULL ORDER BY id DESC LIMIT 1"),
+        "open_sp": db.q1("""SELECT a.id, c.title FROM sp_attempts a JOIN sp_cases c ON c.id=a.case_id
+                            WHERE a.status='abierto' ORDER BY a.id DESC LIMIT 1"""),
         "fichas_due": db.scalar("SELECT COUNT(*) FROM fichas WHERE due<=?", (t,)) or 0,
         "temario": docs, "last_job": job,
         "ai_ready": bool(cfg.get("gemini_api_key")),

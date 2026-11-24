@@ -331,3 +331,30 @@ mark.ans { background: var(--ok-soft); color: var(--ok); font-weight: 700; box-s
 .seq i { width: 8px; height: 14px; border-radius: 2px; }
 .seq i.ok { background: var(--ok); }
 .seq i.ko { background: var(--ko); }
+
+/* ---- supuesto práctico y leyes */
+.qtabs { display: flex; gap: 6px; margin: 12px 0; }
+.qtabs button { flex: 1; min-height: 38px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--sheet); color: var(--ink); font-weight: 700; cursor: pointer; }
+.qtabs button.has { border-color: var(--ink-3); }
+.qtabs button[aria-pressed="true"] { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+textarea.spans { width: 100%; min-height: 42vh; margin-top: 10px; border: 1.5px solid var(--line); background: var(--sheet); color: var(--ink);
+  border-radius: var(--r-md); padding: 12px; font: inherit; font-size: .98rem; line-height: 1.5; resize: vertical; }
+.spenun summary, .spq > summary { cursor: pointer; }
+.spq > summary { display: flex; gap: 10px; align-items: flex-start; list-style: none; }
+.spq { margin-bottom: 10px; }
+.spn { min-width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: .9rem; color: #fff; flex: none; }
+.spn.ok { background: var(--ok); } .spn.ko { background: var(--ko); }
+.spscore { width: 92px; height: 92px; border-radius: 50%; border: 7px solid var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center; flex: none; }
+.spscore.ok { border-color: var(--ok); } .spscore.ko { border-color: var(--ko); }
+.spscore b { font-size: 1.35rem; line-height: 1; } .spscore span { font-size: .7rem; color: var(--ink-3); }
+.okt { color: var(--ok); } .kot { color: var(--ko); }
+ul.okl li::marker { color: var(--ok); } ul.kol li::marker { color: var(--ko); }
+ul.okl, ul.kol { margin: 2px 0 0 18px; }
+.thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.th { position: relative; width: 84px; height: 84px; border-radius: var(--r-sm); overflow: hidden; border: 1.5px solid var(--line); background: var(--sheet); display: grid; place-items: center; cursor: pointer; }
+.th img { width: 100%; height: 100%; object-fit: cover; }
+.th button { position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; border-radius: 50%; border: 0; background: rgba(0,0,0,.65); color: #fff; cursor: pointer; line-height: 1; }
+.th.add span { font-size: .8rem; font-weight: 700; color: var(--ink-2); }
+button.list-item { display: block; width: 100%; background: none; border: 0; border-bottom: 1px solid var(--line); color: inherit; font: inherit; cursor: pointer; padding: 10px 0; }
+.lawrow { display: flex; align-items: center; gap: 10px; }
+details.art { margin-bottom: 8px; } details.art summary { cursor: pointer; }

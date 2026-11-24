@@ -36,6 +36,10 @@ DEFAULT_CONFIG = {
     "fichas_daily_requests": 6,   # peticiones de fichas al día (10 fichas cada una)
     "sim_questions": 100,         # simulacro GSI: 100 preguntas, 90 minutos, A − E/3
     "sim_minutes": 90,
+    "sp_bloque": "III",
+    "sp_minutes": 180,
+    "sp_extract_daily": 10,
+    "leyes_daily_requests": 4,
     "api_token": "",              # opcional: si se define, la app debe enviarlo
     "timezone": "Europe/Madrid",
 }
@@ -188,6 +192,10 @@ def init():
     c.commit()
     import srs
     srs.migrate()
+    import supuestos
+    import leyes
+    supuestos.init()
+    leyes.init()
 
 
 def q(sql, args=()):

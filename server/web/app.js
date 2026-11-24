@@ -52,7 +52,7 @@ const loading = () => `<div class="empty"><span class="spinner"></span></div>`;
 const errBox = (e) => `<main><div class="empty err">${esc(e.message || e)}</div></main>`;
 const pctClass = (p) => (p == null ? "" : p >= 70 ? "" : p >= 50 ? "mid" : "low");
 const fmtDate = (s) => { if (!s) return ""; const d = new Date(s.replace(" ", "T")); return d.toLocaleDateString("es-ES", { day: "numeric", month: "short" }) + " " + d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }); };
-const temaLabel = (id) => !id ? "" : id.startsWith("A1-") ? "A1 · tema " + parseInt(id.slice(3)) : "A2 · " + id.slice(3).replace("-", " tema ").replace(/ tema 0/, " tema ");
+const temaLabel = (id) => !id ? "" : id.startsWith("SP-") ? "Supuestos" : id.startsWith("A1-") ? "A1 · tema " + parseInt(id.slice(3)) : "A2 · " + id.slice(3).replace("-", " tema ").replace(/ tema 0/, " tema ");
 const ICON = {
   gear: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>`,
   book: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 5c3-1 6-1 10 1 4-2 7-2 10-1v14c-3-1-6-1-10 1-4-2-7-2-10-1z"/><path d="M12 6v14"/></svg>`,
@@ -72,10 +72,10 @@ let tickTimer = null;
 function askExit(go) {
   if (!guard) return go();
   const g = guard;
-  modal(`<h2>¿Salir del test?</h2>
-    <p class="small muted">${g.sim ? "Es un simulacro: <b>el tiempo sigue corriendo</b> aunque salgas. Cuando se acabe, se corregirá solo con lo que hayas respondido." : "Tus respuestas se guardan y podrás seguir donde lo dejaste desde «Hoy»."}</p>
-    <div class="stack" style="margin-top:14px"><button class="btn block" id="stay">Seguir con el test</button>
-    <button class="btn ghost block" id="fin">${g.exam ? "Corregir ahora" : "Terminar ahora"}</button>
+  modal(`<h2>${g.sp ? "¿Salir del supuesto?" : "¿Salir del test?"}</h2>
+    <p class="small muted">${g.sp ? "Lo que has escrito está guardado, pero <b>el tiempo sigue corriendo</b>. Cuando se acabe, se entregará solo para corregirlo." : g.sim ? "Es un simulacro: <b>el tiempo sigue corriendo</b> aunque salgas. Cuando se acabe, se corregirá solo con lo que hayas respondido." : "Tus respuestas se guardan y podrás seguir donde lo dejaste desde «Hoy»."}</p>
+    <div class="stack" style="margin-top:14px"><button class="btn block" id="stay">${g.sp ? "Seguir escribiendo" : "Seguir con el test"}</button>
+    <button class="btn ghost block" id="fin">${g.sp ? "Entregar y corregir" : g.exam ? "Corregir ahora" : "Terminar ahora"}</button>
     <button class="btn quiet block" id="out">Salir sin terminar</button></div>`, (box, close) => {
     box.querySelector("#stay").onclick = close;
     box.querySelector("#out").onclick = () => { close(); guard = null; go(); };
@@ -157,13 +157,15 @@ route(/^\/$/, async () => {
     </section>
     <section class="todo">
       ${d.open_test ? `<a href="#/t/${d.open_test.id}" class="hot"><span class="n">›</span><span class="t"><b>${d.open_test.kind === "simulacro" ? "Seguir con el simulacro" : "Seguir con el test"}</b><span>${esc(d.open_test.title)} · ${d.open_test.n} preguntas${d.open_test.kind === "simulacro" ? " · el tiempo corre" : ""}</span></span></a>` : ""}
+      ${d.open_sp ? `<a href="#/sp/${d.open_sp.id}" class="hot"><span class="n">›</span><span class="t"><b>Seguir con el supuesto</b><span>${esc(d.open_sp.title)} · el tiempo corre</span></span></a>` : ""}
       <a href="#/test/5min" class="five"><span class="n">5′</span><span class="t"><b>Modo 5 minutos</b><span>10 preguntas: falladas de hoy y tus temas más flojos</span></span></a>
       <a href="#/test/repaso" class="${d.review_due ? "hot" : ""}"><span class="n ${d.review_due ? "" : "zero"}">${d.review_due}</span><span class="t"><b>Falladas por repasar</b><span>${d.review_due ? "Toca repasarlas hoy" : d.review_total ? `${d.review_total} en seguimiento, ninguna para hoy` : "Aún no hay fallos que repasar"}</span></span></a>
       <a href="#/test/nuevas" class="${d.new_questions ? "hot" : ""}"><span class="n ${d.new_questions ? "" : "zero"}">${d.new_questions}</span><span class="t"><b>Preguntas nuevas</b><span>${d.new_questions ? "Generadas con IA, sin hacer" : "Se generan cada mañana"}</span></span></a>
       <a href="#/fichas" class="${d.fichas_due ? "hot" : ""}"><span class="n ${d.fichas_due ? "" : "zero"}">${d.fichas_due}</span><span class="t"><b>Fichas de conceptos</b><span>${d.fichas_due ? "Tarjetas por repasar hoy" : "Se crean solas a partir de tus fallos"}</span></span></a>
       <a href="#/test/rapido"><span class="n">20</span><span class="t"><b>Test rápido</b><span>Prioriza tus temas débiles y lo que tienes olvidado</span></span></a>
     </section>
-    <section class="row wrap"><a class="btn ghost grow" href="#/simulacro">Simulacro GSI</a><a class="btn ghost grow" href="#/mapa">Mapa de temas</a></section>
+    <section class="row wrap"><a class="btn ghost grow" href="#/simulacro">Simulacro GSI</a><a class="btn ghost grow" href="#/supuesto">Supuesto práctico</a></section>
+    <section class="row wrap"><a class="btn ghost grow" href="#/leyes">Leyes por artículos</a><a class="btn ghost grow" href="#/mapa">Mapa de temas</a></section>
     ${!d.ai_ready ? `<section class="sheet"><h3>Activa la IA</h3><p class="small muted">Para generar preguntas nuevas y explicaciones, añade tu API key de Gemini.</p><a class="btn small" href="#/ajustes">Ir a ajustes</a></section>` : ""}
     ${tem.work || tem.nopdf ? `<section class="small muted">Temario: ${tem.ok} de ${tem.n} documentos indexados${tem.work ? ", leyendo escaneados con OCR" : ""}${tem.nopdf ? `, ${tem.nopdf} sin PDF en la Raspberry` : ""}.</section>` : ""}
     <section class="row"><a class="btn quiet small" href="#/historial">${ICON.hist} Historial</a><span class="grow"></span><span class="tiny">${d.total_questions.toLocaleString("es-ES")} preguntas · ${d.ia_questions} de IA</span></section>
@@ -195,7 +197,8 @@ route(/^\/test$/, async () => {
     const blKeys = bl ? Object.keys(bl) : [];
     const temasTxt = cfg.temas.length ? `${cfg.temas.length} tema${cfg.temas.length > 1 ? "s" : ""} elegido${cfg.temas.length > 1 ? "s" : ""}` : "Todos los temas";
     $app.innerHTML = topbar("Nuevo test", { right: `<a class="iconbtn" href="#/historial" aria-label="Historial">${ICON.hist}</a>` }) + `<main>
-      <section class="row wrap"><a class="btn grow" href="#/simulacro">Simulacro GSI</a><a class="btn ghost grow" href="#/test/5min">5 minutos</a></section>
+      <section class="row wrap"><a class="btn grow" href="#/simulacro">Simulacro GSI</a><a class="btn grow" href="#/supuesto">Supuesto práctico</a></section>
+      <section class="row wrap"><a class="btn ghost grow" href="#/leyes">Leyes por artículos</a><a class="btn ghost grow" href="#/test/5min">5 minutos</a></section>
       <section class="sheet stack">
         <div><h3>Temario</h3><div class="chips" data-k="temario">
           ${[["", "Aleatorio"], ["A1", "A1 · CSSTIC"], ["A2", "A2 · GSI"]].map(([v, t]) => `<button class="chip" data-v="${v}" aria-pressed="${cfg.temario === v}">${t}</button>`).join("")}</div></div>
@@ -385,6 +388,7 @@ function afterAnswer(it) {
     ${it.overridden ? `<p class="tiny">Corregida por ti (el banco decía ${it.correct_bank.toUpperCase()}).</p>` : ""}
     ${it.explanation ? `<div class="note expl">${esc(it.explanation)}</div>` : ""}
     ${it.comments ? `<p class="tiny" style="margin-top:8px">Fuente: ${esc(it.comments)}</p>` : ""}
+    ${it.law_id ? `<p class="small" style="margin-top:6px"><a href="#/ley/${encodeURIComponent(it.law_id)}/${encodeURIComponent(it.law_art || "")}">Leer el ${esc((it.law_art || "artículo").toLowerCase())} en el BOE consolidado</a></p>` : ""}
     ${it.origin === "ia" ? rateBlock(it) : ""}
     ${readyLine(it)}
     ${sourcesBlock(it)}`;
@@ -594,16 +598,24 @@ route(/^\/temario$/, async () => {
   $app.innerHTML = topbar("Temario") + loading();
   const cat = await getCatalog();
   catalog = null; // refresca el estado del OCR la próxima vez
-  const bl = tem === "A1" ? cat.bloques_a1 : cat.bloques_a2;
-  const docs = cat.docs[tem];
-  const groups = Object.keys(bl).map((k) => [k, bl[k], docs.filter((d) => d.bloque === k)]);
-  if (tem === "A2") groups.push(["Otros", "Otros documentos", docs.filter((d) => d.bloque === "Otros")]);
+  const docs = cat.docs[tem] || [];
+  let groups;
+  if (tem === "SP") {
+    const K = [["sp-real", "Exámenes reales del tribunal"], ["sp-enun", "Enunciados de academias y simulacros"], ["sp-sol", "Soluciones y esquemas"],
+      ["sp-feedback", "Correcciones de tu profesor"], ["sp-teoria", "Teoría y plantillas de las sesiones"], ["sp-otro", "Otros"]];
+    groups = K.map(([k, name]) => [k, name, docs.filter((d) => d.kind === k).sort((a, b) => (a.bloque || "Z").localeCompare(b.bloque || "Z") || a.title.localeCompare(b.title))]).filter((g) => g[2].length);
+  } else {
+    const bl = tem === "A1" ? cat.bloques_a1 : cat.bloques_a2;
+    groups = Object.keys(bl).map((k) => [k, bl[k], docs.filter((d) => d.bloque === k)]);
+    if (tem === "A2") groups.push(["Otros", "Otros documentos", docs.filter((d) => d.bloque === "Otros")]);
+  }
   const status = (d) => d.status === "ok" ? (d.questions ? `${d.questions} preg.` : "indexado") : d.status === "ocr" || d.status === "procesando" ? `OCR ${d.progress}%` : d.status === "sin_pdf" ? "sin PDF" : d.status === "error" ? "error" : "en cola";
   $app.innerHTML = topbar("Temario") + `<main>
-    <section><div class="seg" id="tm"><button data-v="A2" aria-pressed="${tem === "A2"}">A2 · GSI</button><button data-v="A1" aria-pressed="${tem === "A1"}">A1 · CSSTIC</button></div></section>
-    <section><form id="sf" role="search"><input type="search" id="sq" placeholder="Buscar en todo el temario ${tem}" aria-label="Buscar en el temario"></form><div id="sr"></div></section>
+    <section><div class="seg" id="tm"><button data-v="A2" aria-pressed="${tem === "A2"}">A2 · GSI</button><button data-v="A1" aria-pressed="${tem === "A1"}">A1 · CSSTIC</button><button data-v="SP" aria-pressed="${tem === "SP"}">Supuestos</button></div></section>
+    <section><form id="sf" role="search"><input type="search" id="sq" placeholder="Buscar en ${tem === "SP" ? "tus supuestos y apuntes" : "todo el temario " + tem}" aria-label="Buscar en el temario"></form><div id="sr"></div></section>
+    ${tem === "SP" && !docs.length ? `<section class="sheet small muted">Aún no hay documentos de supuestos en la Raspberry. Cópialos con <b>instalar.ps1 -SoloSupuestos</b> desde el PC.</section>` : ""}
     <section>${groups.map(([k, name, list]) => `<details class="bloque"><summary>${tem === "A2" && k !== "Otros" ? "Bloque " : ""}${esc(name)}<span class="tiny" style="margin-left:6px">${list.length}</span></summary>
-      <ul class="temas">${list.map((d) => `<li><a href="#/tema/${d.id}"><span class="num">${d.kind === "tema" ? d.num : "·"}</span>
+      <ul class="temas">${list.map((d) => `<li><a href="#/tema/${d.id}"><span class="num">${d.kind === "tema" ? d.num : tem === "SP" ? (d.bloque || "·") : "·"}</span>
         <span class="tt">${esc(d.title)}${d.accuracy != null ? `<div class="pct ${pctClass(d.accuracy)}"><i style="width:${d.accuracy}%"></i></div>` : ""}</span>
         <span class="st">${status(d)}${d.accuracy != null ? `<br>${d.accuracy}%` : ""}</span></a></li>`).join("")}</ul></details>`).join("")}</section></main>`;
   $app.querySelector("#tm").onclick = (e) => { const b = e.target.closest("button"); if (b) { LS.set("temario", b.dataset.v); render(); } };
@@ -613,7 +625,7 @@ route(/^\/temario$/, async () => {
     if (!q) { sr.innerHTML = ""; return; }
     sr.innerHTML = loading();
     const r = await api(`/temario/search?temario=${tem}&q=${encodeURIComponent(q)}&limit=25`);
-    sr.innerHTML = `<div class="sheet" style="margin-top:10px">${r.hits.length ? r.hits.map((h) => `<div class="hit"><div class="where"><a href="${jumpHref(h.doc_id, h.page, h.snip)}">Tema ${h.num} · pág. ${h.page}</a> — ${esc(h.title.slice(0, 60))}</div><div class="snip">${hl(h.snip)}</div></div>`).join("") : `<p class="muted small">Sin resultados.</p>`}</div>`;
+    sr.innerHTML = `<div class="sheet" style="margin-top:10px">${r.hits.length ? r.hits.map((h) => `<div class="hit"><div class="where"><a href="${jumpHref(h.doc_id, h.page, h.snip)}">${h.num ? "Tema " + h.num : "Documento"} · pág. ${h.page}</a> — ${esc(h.title.slice(0, 60))}</div><div class="snip">${hl(h.snip)}</div></div>`).join("") : `<p class="muted small">Sin resultados.</p>`}</div>`;
   };
 }, "temario");
 
@@ -622,14 +634,14 @@ route(/^\/tema\/([^/]+)(?:\/p\/(\d+))?(?:\/h\/(.+))?$/, async (id, page, hjson) 
   try { hlInfo = hjson ? JSON.parse(hjson) : null; } catch (e) { hlInfo = null; }
   $app.innerHTML = topbar("Tema", { back: true }) + loading();
   const d = await api("/temario/" + id);
-  const name = d.kind === "tema" ? (d.temario === "A2" ? `Bloque ${d.bloque} · Tema ${d.num}` : `Tema ${d.num}`) : "Documento";
+  const name = d.kind === "tema" ? (d.temario === "A2" ? `Bloque ${d.bloque} · Tema ${d.num}` : `Tema ${d.num}`) : d.temario === "SP" ? "Supuestos" : "Documento";
   let from = page ? Math.max(1, +page - 1) : 1;
   $app.innerHTML = topbar(name, { back: true }) + `<main>
     <section><h2 style="font-size:1.15rem">${esc(d.title)}</h2>
       <p class="small muted">${d.pages ? d.pages + " páginas" : "PDF no disponible"}${d.indexed && d.indexed < d.pages ? ` · ${d.indexed} con texto (OCR en curso)` : ""} · ${d.questions} preguntas asociadas</p>
       <div class="row wrap">
         ${d.questions ? `<button class="btn grow" id="tt">Test de este tema</button>` : ""}
-        ${d.pdf_available[0] ? `<a class="btn ghost grow" href="#/pdf/${id}/${page || 1}">Ver PDF</a>` : ""}
+        ${d.pdf_available[0] && /\.pdf$/i.test(d.files[0] || "") ? `<a class="btn ghost grow" href="#/pdf/${id}/${page || 1}">Ver PDF</a>` : d.pdf_available[0] ? `<a class="btn ghost grow" href="/api/temario/${id}/pdf?file=0${token() ? "&" + tokq() : ""}" target="_blank">Abrir el archivo</a>` : ""}
         ${d.resumen_available ? `<a class="btn quiet grow" href="#/pdf/${id}/1/resumen">Resumen</a>` : ""}
       </div>
       ${d.kind === "tema" ? `<div class="row" style="margin-top:10px"><input type="number" id="gn" min="1" max="50" value="10" style="max-width:90px" aria-label="Número de preguntas"><button class="btn quiet grow" id="gen">${ICON.ai} Generar preguntas de este tema</button></div><p class="small" id="genst"></p>` : ""}
@@ -860,7 +872,7 @@ route(/^\/fichas(?:\/([^/]+))?$/, async (doc) => {
         ${flipped ? `<span class="back">${esc(f.texto)}</span>` : `<span class="tiny">Piensa la respuesta y toca para darle la vuelta</span>`}
       </button>
       ${flipped ? `<div class="row" style="margin-top:14px"><button class="btn grow ko" id="no">No lo sabía</button><button class="btn grow okb" id="si">Lo sabía</button></div>
-        <p class="tiny" style="text-align:center;margin-top:10px"><a href="#/q/${f.question_id}">Ver la pregunta original</a></p>` : ""}
+        ${f.question_id ? `<p class="tiny" style="text-align:center;margin-top:10px"><a href="#/q/${f.question_id}">Ver la pregunta original</a></p>` : ""}` : ""}
     </main>`;
     $app.querySelector("#card").onclick = () => { flipped = !flipped; draw(); };
     const ans = async (ok) => { try { await api(`/fichas/${f.id}/review`, { body: { ok } }); ok ? okN++ : koN++; i++; flipped = false; draw(); } catch (e) { toast(e.message); } };
@@ -877,6 +889,221 @@ route(/^\/fichas(?:\/([^/]+))?$/, async (doc) => {
   }
   draw();
 }, "repaso");
+
+/* ------------------------------------------------------------------ supuesto práctico */
+const SP_ORIGIN = { real: "Examen real", academia: "Academia", ia: "Nuevo · IA" };
+const nota50 = (x) => (x == null ? "–" : String(Math.round(x * 100) / 100).replace(".", ","));
+route(/^\/supuesto$/, async () => {
+  $app.innerHTML = topbar("Supuesto práctico", { back: true }) + loading();
+  let bloque = LS.get("spb", null);
+  let r = await api("/sp" + (bloque ? "?bloque=" + bloque : ""));
+  bloque = r.bloque;
+  const draw = () => {
+    const cases = r.cases.filter((c) => c.bloque === bloque);
+    const open = r.attempts.find((a) => a.status === "abierto");
+    const done = r.attempts.filter((a) => a.status !== "abierto");
+    $app.innerHTML = topbar("Supuesto práctico", { back: true }) + `<main>
+      <section><div class="seg" id="bq">${Object.entries(r.bloques).map(([k, v]) => `<button data-v="${k}" aria-pressed="${bloque === k}">${esc(v.split(" · ")[0])}</button>`).join("")}</div></section>
+      ${open ? `<a class="btn block" href="#/sp/${open.id}">Seguir con «${esc(open.title)}»</a>` : ""}
+      <section class="sheet"><h2>Segundo ejercicio del GSI</h2>
+        <p class="small muted">5 preguntas, ${r.minutes} minutos. Escribe tus respuestas y añade fotos de lo que hagas a mano (diagramas). Se corrige con los criterios oficiales del INAP: <b>técnica 30, análisis 10, sistemática 5 y expresión 5</b>; se aprueba con 25.</p>
+        <div class="row wrap" style="margin-top:10px"><button class="btn grow" id="real" ${cases.some((c) => c.origin !== "ia") ? "" : "disabled"}>Uno real al azar</button><button class="btn ghost grow" id="gen">${ICON.ai} Crear uno nuevo con IA</button></div>
+        <p class="small" id="st"></p></section>
+      <section class="sheet small muted">Tus documentos de supuestos: ${r.docs_ok} de ${r.docs_total} leídos en la Raspberry${r.pending_extract ? ` · la IA aún tiene ${r.pending_extract} por revisar para sacar enunciados (lo hace sola poco a poco) <button class="btn quiet small" id="ext">Revisar 2 ahora</button>` : ""}.</section>
+      ${done.length ? `<section><h2>Tus supuestos</h2><div class="sheet">${done.map((a) => `<a class="list-item" href="#/sp/${a.id}"><div class="row"><b class="grow small">${esc(a.title)}</b><b class="${a.score == null ? "" : a.score >= 25 ? "okt" : "kot"}">${a.status === "corregido" ? nota50(a.score) + "/50" : a.status === "error" ? "error" : "corrigiendo…"}</b></div><div class="tiny">${fmtDate(a.finished_at || a.started_at)} · bloque ${a.bloque}</div></a>`).join("")}</div></section>` : ""}
+      <section><h2>Catálogo · ${esc(r.bloques[bloque])}</h2><div class="sheet">${cases.length ? cases.map((c) => `<button class="list-item spc" data-id="${c.id}"><div class="row"><span class="tag ${c.origin === "ia" ? "ia" : c.origin === "real" ? "exam" : ""}">${SP_ORIGIN[c.origin]}</span><b class="grow small" style="text-align:left">${esc(c.title)}</b>${c.best != null ? `<b class="small">${nota50(c.best)}</b>` : ""}</div>
+        <div class="tiny" style="text-align:left">${esc(c.year || "")}${c.has_solution ? " · con solución de academia" : ""}${c.tries ? ` · hecho ${c.tries} vez${c.tries > 1 ? "es" : ""}` : ""}</div></button>`).join("") : `<p class="muted small">Todavía no hay supuestos de este bloque en el catálogo. La IA los saca de tus PDF en segundo plano; mientras, puedes crear uno nuevo.</p>`}</div></section>
+    </main>`;
+    $app.querySelector("#bq").onclick = (e) => { const b = e.target.closest("button"); if (b) { bloque = b.dataset.v; LS.set("spb", bloque); draw(); } };
+    const st = $app.querySelector("#st");
+    const startCase = async (cid) => { try { const a = await api("/sp/start", { body: { case_id: cid } }); location.hash = "#/sp/" + a.id; } catch (e) { toast(e.message); } };
+    $app.querySelectorAll(".spc").forEach((b) => b.onclick = async () => {
+      const c = await api("/sp/case/" + b.dataset.id);
+      modal(`<p class="tiny">${SP_ORIGIN[c.origin]} · bloque ${c.bloque} ${esc(c.year || "")}</p><h2>${esc(c.title)}</h2>
+        <div class="small muted" style="max-height:30vh;overflow:auto;white-space:pre-wrap">${esc(c.enunciado.slice(0, 1200))}${c.enunciado.length > 1200 ? "…" : ""}</div>
+        <ol class="small" style="margin:10px 0 0 18px">${c.preguntas.map((p) => `<li>${esc(p)}</li>`).join("")}</ol>
+        <div class="stack" style="margin-top:12px"><button class="btn block" id="go">Empezar (cuenta atrás)</button></div>`, (box, close) => {
+        box.querySelector("#go").onclick = () => { close(); startCase(c.id); };
+      });
+    });
+    $app.querySelector("#real").onclick = () => { const pool = cases.filter((c) => c.origin !== "ia"); const fresh = pool.filter((c) => !c.tries); const pick = (fresh.length ? fresh : pool)[Math.floor(Math.random() * (fresh.length || pool.length))]; pick && startCase(pick.id); };
+    $app.querySelector("#gen").onclick = async (e) => {
+      e.target.disabled = true; st.innerHTML = `<span class="spinner"></span> Redactando un supuesto nuevo…`;
+      try { const c = await api("/sp/generate", { body: { bloque }, timeout: 150000 }); st.textContent = ""; startCase(c.id); }
+      catch (err) { st.innerHTML = `<span class="err">${esc(err.message)}</span>`; e.target.disabled = false; }
+    };
+    const ext = $app.querySelector("#ext");
+    ext && (ext.onclick = async () => { ext.disabled = true; ext.innerHTML = `<span class="spinner"></span>`; try { r = await api("/sp/extract", { body: { k: 2 }, timeout: 300000 }); toast("Catálogo actualizado"); draw(); } catch (e) { toast(e.message); ext.disabled = false; ext.textContent = "Revisar 2 ahora"; } });
+  };
+  draw();
+}, "test");
+
+function shrinkImage(file, max = 1600) {
+  return new Promise((res, rej) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      res(c.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => rej(new Error("No se pudo leer la foto"));
+    img.src = url;
+  });
+}
+
+route(/^\/sp\/(\d+)$/, async (aid) => {
+  $app.innerHTML = topbar("Supuesto", { back: true }) + loading();
+  let a = await api("/sp/a/" + aid);
+  if (a.status !== "abierto") return spResult(a);
+  const c = a.case;
+  const n = c.preguntas.length;
+  let cur = +(sessionStorage.getItem("spq-" + aid) || 1);
+  const imgUrl = (name) => `/api/sp/a/${aid}/img/${encodeURIComponent(name)}${token() ? "?" + tokq() : ""}`;
+  const deadline = Date.now() + a.time_left * 1000;
+  let dirty = false, saveT = null;
+  guard = { hash: "#/sp/" + aid, sp: true, onFinish: () => deliver(true) };
+  document.body.classList.add("testing");
+  const clock = () => {
+    const el = document.getElementById("clock"); const left = Math.max(0, Math.round((deadline - Date.now()) / 1000));
+    if (el) { el.textContent = `${Math.floor(left / 3600)}:${String(Math.floor(left / 60) % 60).padStart(2, "0")}:${String(left % 60).padStart(2, "0")}`; el.classList.toggle("low", left < 900); }
+    if (left <= 0 && guard) { clearInterval(tickTimer); tickTimer = null; toast("Se acabó el tiempo: se entrega", 3500); deliver(true); }
+  };
+  tickTimer = setInterval(clock, 1000);
+  async function save() {
+    if (!dirty) return; dirty = false;
+    const ta = $app.querySelector("#ans"); if (ta) a.answers[cur] = ta.value;
+    try { await api(`/sp/a/${aid}/save`, { body: { answers: a.answers } }); const s = $app.querySelector("#sv"); s && (s.textContent = "Guardado"); }
+    catch (e) { dirty = true; const s = $app.querySelector("#sv"); s && (s.textContent = "Sin guardar: " + e.message); }
+  }
+  const draw = () => {
+    sessionStorage.setItem("spq-" + aid, cur);
+    const imgs = a.images[cur] || [];
+    $app.innerHTML = topbar(c.title, { back: true, right: `<span class="clock" id="clock"></span>` }) + `<main>
+      <details class="sheet spenun" ${cur === 1 && !(a.answers[1] || "").length ? "open" : ""}><summary><b>Enunciado</b> <span class="tiny">bloque ${c.bloque}</span></summary><div class="small" style="white-space:pre-wrap;margin-top:8px">${esc(c.enunciado)}</div></details>
+      <div class="qtabs">${c.preguntas.map((_, i) => `<button data-i="${i + 1}" aria-pressed="${cur === i + 1}" class="${(a.answers[i + 1] || "").trim() || (a.images[i + 1] || []).length ? "has" : ""}">${i + 1}</button>`).join("")}</div>
+      <div class="qtext" style="font-size:1rem">${cur}. ${esc(c.preguntas[cur - 1])}</div>
+      <textarea id="ans" class="spans" placeholder="Escribe tu respuesta. Para los diagramas puedes describirlos (actores y casos de uso, entidades y relaciones con cardinalidad, mensajes numerados…) o añadir fotos de lo que hagas en papel.">${esc(a.answers[cur] || "")}</textarea>
+      <div class="row" style="margin-top:6px"><span class="tiny grow" id="sv">${(a.answers[cur] || "").length ? "Guardado" : ""}</span><span class="tiny" id="cc">${(a.answers[cur] || "").length} caracteres</span></div>
+      <div class="thumbs">${imgs.map((nm) => `<div class="th"><img src="${imgUrl(nm)}" alt="Foto de la respuesta"><button data-n="${esc(nm)}" aria-label="Quitar foto">×</button></div>`).join("")}
+        <label class="th add"><input type="file" accept="image/*" multiple hidden id="pic"><span>+ Foto</span></label></div>
+    </main>
+    <div class="testbar"><div class="in">
+      <button class="btn quiet" id="prev" ${cur === 1 ? "disabled" : ""} aria-label="Anterior">‹</button>
+      ${cur < n ? `<button class="btn grow" id="next">Siguiente pregunta</button>` : `<button class="btn grow guide" id="fin">Entregar y corregir</button>`}
+    </div></div>`;
+    const ta = $app.querySelector("#ans");
+    ta.oninput = () => { a.answers[cur] = ta.value; dirty = true; $app.querySelector("#sv").textContent = "…"; $app.querySelector("#cc").textContent = ta.value.length + " caracteres"; clearTimeout(saveT); saveT = setTimeout(save, 1500); };
+    $app.querySelector(".qtabs").onclick = async (e) => { const b = e.target.closest("button"); if (!b) return; await save(); cur = +b.dataset.i; draw(); };
+    $app.querySelector("#prev").onclick = async () => { await save(); cur--; draw(); };
+    const nx = $app.querySelector("#next"); nx && (nx.onclick = async () => { await save(); cur++; draw(); window.scrollTo(0, 0); });
+    const fn = $app.querySelector("#fin"); fn && (fn.onclick = () => deliver(false));
+    $app.querySelector("#pic").onchange = async (e) => {
+      for (const f of e.target.files) {
+        try { const data = await shrinkImage(f); const r = await api(`/sp/a/${aid}/image`, { body: { n: cur, data } }); a.images = r.images; }
+        catch (err) { toast(err.message); }
+      }
+      draw();
+    };
+    $app.querySelectorAll(".th button").forEach((b) => b.onclick = async () => { const r = await api(`/sp/a/${aid}/image/del`, { body: { n: cur, name: b.dataset.n } }); a.images = r.images; draw(); });
+    clock();
+  };
+  async function deliver(force) {
+    await save();
+    const empty = c.preguntas.filter((_, i) => !(a.answers[i + 1] || "").trim() && !(a.images[i + 1] || []).length).length;
+    if (!force && !confirm(empty ? `Tienes ${empty} pregunta${empty > 1 ? "s" : ""} sin responder. ¿Entregar igualmente?` : "¿Entregar el supuesto para corregirlo?")) return;
+    guard = null; if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+    try { a = await api(`/sp/a/${aid}/finish`, { body: {} }); } catch (e) { return toast(e.message); }
+    spResult(a);
+  }
+  draw();
+}, "test");
+
+function spResult(a) {
+  document.body.classList.remove("testing");
+  const c = a.case;
+  const imgUrl = (name) => `/api/sp/a/${a.id}/img/${encodeURIComponent(name)}${token() ? "?" + tokq() : ""}`;
+  if (a.status === "corrigiendo") {
+    $app.innerHTML = topbar(c.title, { back: true }) + `<main><div class="empty"><span class="spinner"></span><p>Corrigiendo con los criterios del tribunal… suele tardar uno o dos minutos. Te llegará un aviso al terminar.</p></div></main>`;
+    const t = setInterval(async () => {
+      if (!location.hash.startsWith("#/sp/" + a.id)) return clearInterval(t);
+      try { const n = await api("/sp/a/" + a.id); if (n.status !== "corrigiendo") { clearInterval(t); spResult(n); } } catch (e) {}
+    }, 5000);
+    return;
+  }
+  if (a.status === "error") {
+    $app.innerHTML = topbar(c.title, { back: true }) + `<main><div class="empty err">No se pudo corregir: ${esc(a.error || "")}</div><button class="btn block" id="re">Volver a intentarlo</button></main>`;
+    $app.querySelector("#re").onclick = async () => spResult(await api(`/sp/a/${a.id}/finish`, { body: {} }));
+    return;
+  }
+  const r = a.result || {}, p = r.puntuacion || {};
+  const crit = [["tecnica", "Conocimientos técnicos aplicados", 30], ["analisis", "Capacidad de análisis", 10], ["sistematica", "Sistemática", 5], ["expresion", "Expresión escrita", 5]];
+  const pq = {}; (r.por_pregunta || []).forEach((x) => (pq[x.n] = x));
+  $app.innerHTML = topbar(c.title, { back: true }) + `<main>
+    <section class="sheet"><div class="goalrow"><div class="spscore ${r.total >= 25 ? "ok" : "ko"}"><b>${nota50(r.total)}</b><span>de 50</span></div>
+      <div class="goalinfo"><b>${r.total >= 25 ? "Aprobado" : "Por debajo de 25"}</b><span>${esc(r.resumen || "")}</span></div></div>
+      <div style="margin-top:12px">${crit.map(([k, t, m]) => `<div class="row small" style="margin-top:6px"><span class="grow">${t}</span><b>${nota50(p[k])} / ${m}</b></div><div class="pct ${pctClass(100 * (p[k] || 0) / m)}"><i style="width:${100 * (p[k] || 0) / m}%"></i></div>`).join("")}</div>
+      <p class="tiny" style="margin-top:10px">Corrección orientativa de la IA con los criterios del INAP${c.solutions && c.solutions.length ? ", apoyada en la solución de la academia" : ""}. Los conceptos flojos se han añadido a tus fichas.</p></section>
+    ${(r.consejos || []).length ? `<section class="sheet"><h3>Consejos para el examen</h3><ul class="small" style="margin:6px 0 0 18px">${r.consejos.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></section>` : ""}
+    <section>${c.preguntas.map((q, i) => { const x = pq[i + 1] || {}; const imgs = a.images[i + 1] || [];
+      return `<details class="sheet spq"><summary><span class="spn ${x.nota >= 5 ? "ok" : "ko"}">${x.nota != null ? String(x.nota).replace(".", ",") : "–"}</span><span class="small grow">${i + 1}. ${esc(q)}</span></summary>
+        ${x.valoracion ? `<p class="small" style="margin-top:8px"><b>${esc(x.valoracion)}</b></p>` : ""}
+        ${(x.bien || []).length ? `<p class="tiny" style="margin-top:6px">Bien</p><ul class="small okl">${x.bien.map((y) => `<li>${esc(y)}</li>`).join("")}</ul>` : ""}
+        ${(x.falta || []).length ? `<p class="tiny" style="margin-top:6px">Te faltó</p><ul class="small kol">${x.falta.map((y) => `<li>${esc(y)}</li>`).join("")}</ul>` : ""}
+        ${(x.errores || []).length ? `<p class="tiny" style="margin-top:6px">Errores</p><ul class="small kol">${x.errores.map((y) => `<li>${esc(y)}</li>`).join("")}</ul>` : ""}
+        <details style="margin-top:8px"><summary class="small"><b>Tu respuesta</b></summary><div class="small" style="white-space:pre-wrap;margin-top:6px">${esc(a.answers[i + 1] || "(en blanco)")}</div>${imgs.length ? `<div class="thumbs">${imgs.map((nm) => `<a class="th" href="${imgUrl(nm)}" target="_blank"><img src="${imgUrl(nm)}" alt=""></a>`).join("")}</div>` : ""}</details>
+        ${x.solucion_modelo ? `<details style="margin-top:8px"><summary class="small"><b>Respuesta modelo</b></summary><div class="small note expl" style="white-space:pre-wrap;margin-top:6px">${esc(x.solucion_modelo)}</div></details>` : ""}
+        ${(x.refs || []).length ? `<p class="tiny" style="margin-top:8px">En tus apuntes: ${x.refs.map((rf) => `<a href="${jumpHref(rf.doc_id, rf.page, rf.snip)}">${esc(rf.title.slice(0, 50))} · pág. ${rf.page}</a>`).join(" · ")}</p>` : ""}
+      </details>`; }).join("")}</section>
+    ${c.solutions && c.solutions.length ? `<section class="sheet"><h3>Solución de la academia</h3>${c.solutions.map((s) => `<a class="list-item small" href="#/tema/${s.id}">${esc(s.title || s.id)}</a>`).join("")}</section>` : ""}
+    <section class="sheet"><details><summary><b>Enunciado</b></summary><div class="small" style="white-space:pre-wrap;margin-top:8px">${esc(c.enunciado)}</div></details></section>
+    <section class="row wrap"><a class="btn grow" href="#/supuesto">Otro supuesto</a><a class="btn ghost grow" href="#/fichas">Repasar fichas</a></section>
+  </main>`;
+}
+
+/* ------------------------------------------------------------------ leyes por artículos */
+route(/^\/leyes(?:\/(A1|A2))?$/, async (tem) => {
+  tem = tem || LS.get("leyesT", "A2"); LS.set("leyesT", tem);
+  $app.innerHTML = topbar("Leyes por artículos", { back: true }) + loading();
+  const r = await api("/leyes?temario=" + tem);
+  $app.innerHTML = topbar("Leyes por artículos", { back: true }) + `<main>
+    <section><div class="seg"><a class="segl" href="#/leyes/A2" aria-pressed="${tem === "A2"}">A2 · GSI</a><a class="segl" href="#/leyes/A1" aria-pressed="${tem === "A1"}">A1 · CSSTIC</a></div></section>
+    <section class="sheet small muted">Texto consolidado y vigente del BOE, descargado por la Raspberry. La IA crea preguntas literales de plazos, órganos, cifras y excepciones citando el artículo (${r.requests_today}/${r.cap} tandas hoy). También salen en los tests normales.</section>
+    <section class="sheet">${r.laws.map((l) => `<div class="list-item lawrow"><a href="#/ley/${encodeURIComponent(l.id)}" class="grow" style="text-decoration:none;color:inherit"><b class="small">${esc(l.short)}</b> <span class="small muted">${esc(l.title)}</span>
+        <div class="tiny">${l.status === "ok" ? `${l.n_articles} artículos · ${l.nq} preguntas${l.accuracy != null ? ` · ${l.accuracy}% de acierto en ${l.answered}` : ""}` : l.status === "error" ? `<span class="err">no se pudo descargar: ${esc(l.error || "")}</span>` : "descargando del BOE…"}</div></a>
+        ${l.nq ? `<button class="btn small" data-t="${esc(l.id)}">Test</button>` : l.status === "ok" ? `<button class="btn small quiet" data-g="${esc(l.id)}">${ICON.ai}</button>` : ""}</div>`).join("")}</section>
+  </main>`;
+  $app.querySelectorAll("[data-t]").forEach((b) => b.onclick = async () => {
+    const l = r.laws.find((x) => x.id === b.dataset.t);
+    try { const t = await api("/tests", { body: { kind: "normal", n: 20, filters: { ley: l.id, priorizar_no_vistas: true }, title: l.short } }); location.hash = "#/t/" + t.id; } catch (e) { toast(e.message); }
+  });
+  $app.querySelectorAll("[data-g]").forEach((b) => b.onclick = async () => {
+    b.disabled = true; b.innerHTML = `<span class="spinner"></span>`;
+    try { const x = await api(`/leyes/${encodeURIComponent(b.dataset.g)}/generate`, { body: { n: 8 }, timeout: 150000 }); toast(`${x.created} preguntas nuevas`); render(); } catch (e) { toast(e.message); b.disabled = false; b.innerHTML = ICON.ai; }
+  });
+}, "temario");
+
+route(/^\/ley\/([^/]+)(?:\/(.+))?$/, async (lid, art) => {
+  $app.innerHTML = topbar("Ley", { back: true }) + loading();
+  const r = await api("/leyes/" + encodeURIComponent(lid));
+  const L = r.law;
+  let q = "";
+  const draw = () => {
+    const ql = q.toLowerCase();
+    const list = q ? r.articles.filter((a) => a.texto.toLowerCase().includes(ql) || (a.titulo || "").toLowerCase().includes(ql) || a.num.toLowerCase().includes(ql)) : r.articles;
+    $app.querySelector("#arts").innerHTML = list.slice(0, 400).map((a) => `<details class="sheet art" id="art-${a.idx}" ${art && a.num === art ? "open" : ""}><summary><b>${esc(a.num)}</b> <span class="small muted">${esc(a.titulo || "")}</span>${a.nq ? ` <span class="tiny">· ${a.nq} preg.</span>` : ""}</summary><div class="small" style="white-space:pre-wrap;margin-top:8px">${esc(a.texto)}</div></details>`).join("") || `<p class="muted small">Sin resultados.</p>`;
+  };
+  $app.innerHTML = topbar(L.short, { back: true }) + `<main>
+    <section><h2 style="font-size:1.1rem">${esc(L.title)}</h2><p class="tiny">${L.n_articles} preceptos · texto consolidado del BOE${L.fetched_at ? " · actualizado " + fmtDate(L.fetched_at) : ""}</p>
+      <div class="row wrap"><button class="btn grow" id="tt">Test de esta ley</button><button class="btn ghost grow" id="gen">${ICON.ai} 8 preguntas nuevas</button></div></section>
+    <section><input type="search" id="sq" placeholder="Buscar: «plazo», «tres meses», «artículo 21»…" aria-label="Buscar en la ley"></section>
+    <section id="arts"></section></main>`;
+  draw();
+  if (art) { const el = $app.querySelector("details[open]"); el && el.scrollIntoView({ block: "start" }); }
+  $app.querySelector("#sq").oninput = (e) => { q = e.target.value.trim(); draw(); };
+  $app.querySelector("#tt").onclick = async () => { try { const t = await api("/tests", { body: { kind: "normal", n: 20, filters: { ley: L.id, priorizar_no_vistas: true }, title: L.short } }); location.hash = "#/t/" + t.id; } catch (e) { toast(e.message.includes("No hay") ? "Aún no hay preguntas de esta ley: genera unas cuantas" : e.message); } };
+  $app.querySelector("#gen").onclick = async (e) => { e.target.disabled = true; try { const x = await api(`/leyes/${encodeURIComponent(L.id)}/generate`, { body: { n: 8 }, timeout: 150000 }); toast(`${x.created} preguntas nuevas`); } catch (err) { toast(err.message); } e.target.disabled = false; };
+}, "temario");
 
 /* ------------------------------------------------------------------ ajustes */
 route(/^\/ajustes$/, async () => {
@@ -901,6 +1128,8 @@ route(/^\/ajustes$/, async () => {
       <label class="field"><span>Repaso inteligente: cuánto quieres recordar</span><select data-k="target_retention">${[["0.85", "85 % · menos repasos"], ["0.9", "90 % · equilibrado"], ["0.95", "95 % · más repasos, más seguro"]].map(([v, t]) => `<option value="${v}" ${Math.abs((s.target_retention ?? 0.9) - +v) < 0.001 ? "selected" : ""}>${t}</option>`).join("")}</select></label>
       ${num("fichas_daily_requests", "Lotes de fichas al día (10 fichas cada uno; 0 = no crear)", 0, 50)}
       <div class="row">${num("sim_questions", "Preguntas del simulacro", 10, 105)}${num("sim_minutes", "Minutos del simulacro", 5, 240)}</div>
+      <div class="row"><label class="field grow"><span>Bloque del supuesto práctico</span><select data-k="sp_bloque">${[["III", "III · Desarrollo"], ["IV", "IV · Sistemas"]].map(([v, t]) => `<option value="${v}" ${s.sp_bloque === v ? "selected" : ""}>${t}</option>`).join("")}</select></label>${num("sp_minutes", "Minutos del supuesto", 30, 300)}</div>
+      <div class="row">${num("sp_extract_daily", "Documentos de supuestos leídos por la IA al día", 0, 100)}${num("leyes_daily_requests", "Tandas de preguntas de leyes al día (8 cada una)", 0, 50)}</div>
       <div class="row">${num("daily_gen_hour", "Hora de generación", 0, 23)}${num("review_reminder_hour", "Aviso de repaso", 0, 23)}${num("goal_reminder_hour", "Aviso de mínimo", 0, 23)}</div>
     </section>
     <section class="sheet"><h2>Inteligencia artificial (Gemini)</h2>

@@ -19,9 +19,12 @@ import time
 import traceback
 
 import db
+import logic
 import gemini
 import sources
 import fichas
+import leyes
+import supuestos
 
 IA_GAP = 150          # segundos mínimos entre explicaciones preparadas (unas pocas, repartidas)
 IA_GAP_OPEN_TEST = 30  # más rápido si son del test que estás haciendo
@@ -126,6 +129,43 @@ def tick():
                            (qid, "internet", '{"results": [], "errors": ["sin resultados al preparar"], "query": "", "search_url": ""}'))
             except Exception:
                 _state["net_backoff_until"] = now + NET_BACKOFF
+
+    # ---- Leyes: descarga del BOE (sin IA), una norma cada 3 minutos hasta tenerlas todas
+    if now - _state.get("last_law_fetch", 0) >= 180:
+        _state["last_law_fetch"] = now
+        try:
+            if leyes.fetch_pending(1):
+                return
+        except Exception:
+            traceback.print_exc()
+
+    ai_ok = bool(cfg.get("gemini_api_key")) and gemini.quota_ok_for_background()
+
+    # ---- Supuestos: extraer el catálogo de tus PDF (un documento cada 15 min, con tope diario)
+    sp_cap = int(cfg.get("sp_extract_daily", 10))
+    if ai_ok and sp_cap > 0 and now - _state.get("last_sp", 0) >= 900 \
+            and int(db.kv_get("sp_extract_docs_" + logic.today(), 0) or 0) < sp_cap and supuestos.pending_extract():
+        _state["last_sp"] = now
+        db.kv_set("sp_extract_docs_" + logic.today(), int(db.kv_get("sp_extract_docs_" + logic.today(), 0) or 0) + 1)
+        try:
+            supuestos.extract_some(1, background=True)
+        except gemini.QuotaError:
+            _state["last_sp"] = now + 3600
+        except Exception:
+            traceback.print_exc()
+        return
+
+    # ---- Preguntas de leyes por artículos: unas pocas tandas al día
+    l_cap = int(cfg.get("leyes_daily_requests", 4))
+    if ai_ok and l_cap > 0 and leyes.requests_today() < l_cap and now - _state.get("last_leyes", 0) >= 1500 and leyes.next_law():
+        _state["last_leyes"] = now
+        try:
+            leyes.generate(background=True)
+        except gemini.QuotaError:
+            _state["last_leyes"] = now + 3600
+        except Exception:
+            traceback.print_exc()
+        return
 
     # ---- Fichas de las falladas: una petición (10 fichas) cada 20 min como mucho, con tope diario
     f_cap = int(cfg.get("fichas_daily_requests", 6))
@@ -332,6 +372,12 @@ def night_tick(now=None):
     try:
         if fichas.pending(1) and reqs % 3 == 0:        # de noche, una de cada tres peticiones es para fichas
             fichas.generate_batch(background=True)
+            return
+        if reqs % 5 == 1 and supuestos.pending_extract():      # catálogo de supuestos
+            supuestos.extract_some(1, background=True)
+            return
+        if reqs % 5 == 2 and leyes.next_law():                 # preguntas de leyes
+            leyes.generate(background=True)
             return
         n = run_batch_request()
         db.kv_set(f"night_ia_{day}", int(db.kv_get(f"night_ia_{day}", 0) or 0) + n)

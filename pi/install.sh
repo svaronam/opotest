@@ -62,7 +62,7 @@ fi
 "$APP/venv/bin/pip" install -q --upgrade pip
 "$APP/venv/bin/pip" install -q "starlette>=0.40" "uvicorn>=0.30"
 
-mkdir -p "$APP/temario/A1" "$APP/temario/A2" "$APP/server/var" "$APP/server/web/vendor"
+mkdir -p "$APP/temario/A1" "$APP/temario/A2" "$APP/temario/SP" "$APP/server/var" "$APP/server/web/vendor"
 
 echo "-> Visor de PDF (pdf.js) en local"
 PDFJS=https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38

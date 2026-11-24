@@ -6,6 +6,7 @@
 - Cuenta las peticiones de cada día para mostrarlas en Ajustes → Diagnóstico.
 """
 import datetime as dt
+import base64
 import json
 import re
 import socket
@@ -226,7 +227,7 @@ def _fmt_until(ts):
 # ------------------------------------------------------------------ llamada principal
 
 def generate(prompt, schema=None, temperature=0.7, system=None, max_tokens=8192, quick=False, thinking=None,
-             budget=None, call_timeout=None, kind="otro", background=False, models=None):
+             budget=None, call_timeout=None, kind="otro", background=False, models=None, images=None):
     """Devuelve el texto (o el JSON ya parseado si se pasa schema).
     quick: un intento por modelo y espera corta (prueba de Ajustes).
     thinking: 'minimal' | 'low' | 'medium' | None. Menos razonamiento = respuesta más rápida.
@@ -239,7 +240,10 @@ def generate(prompt, schema=None, temperature=0.7, system=None, max_tokens=8192,
     if schema:
         gen_cfg["responseMimeType"] = "application/json"
         gen_cfg["responseSchema"] = schema
-    body = {"contents": [{"role": "user", "parts": [{"text": prompt}]}], "generationConfig": gen_cfg}
+    parts = [{"text": prompt}]
+    for mime, data in images or []:          # fotos (p. ej. respuestas a mano del supuesto práctico)
+        parts.append({"inline_data": {"mime_type": mime, "data": base64.b64encode(data).decode()}})
+    body = {"contents": [{"role": "user", "parts": parts}], "generationConfig": gen_cfg}
     if system:
         body["systemInstruction"] = {"parts": [{"text": system}]}
     models = list(models or []) or ([cfg.get("gemini_model") or "gemini-3.8-flash"] + list(cfg.get("gemini_fallback_models") or []))

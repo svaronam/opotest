@@ -7,8 +7,8 @@ android {
         applicationId 'es.sergio.opotest'
         minSdk 26
         targetSdk 35
-        versionCode 3
-        versionName '1.1.1'
+        versionCode 4
+        versionName '1.2.0'
     }
     signingConfigs {
         // Firma fija para que las actualizaciones se instalen encima de la versión anterior.

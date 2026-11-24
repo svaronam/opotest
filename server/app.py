@@ -22,6 +22,8 @@ import sources
 import gemini
 import prefetch
 import extras
+import leyes
+import supuestos
 import fichas
 
 WEB = os.path.join(db.BASE, "web")
@@ -129,7 +131,9 @@ def doc_pdf(req, body):
     path = os.path.realpath(os.path.join(root, rel))
     if not path.startswith(root + os.sep) or not os.path.exists(path):
         return err("El PDF no está en la Raspberry (cópialo con el script del PC).", 404)
-    return FileResponse(path, media_type="application/pdf",
+    import mimetypes
+    mime = mimetypes.guess_type(path)[0] or "application/octet-stream"
+    return FileResponse(path, media_type=mime,
                         headers={"Content-Disposition": "inline", "Cache-Control": "max-age=86400"})
 
 
@@ -137,7 +141,7 @@ def temario_search(req, body):
     text = qp(req, "q", "")
     temario = qp(req, "temario")
     docs = None
-    if temario in ("A1", "A2"):
+    if temario in ("A1", "A2", "SP"):
         docs = [r["id"] for r in db.q("SELECT id FROM docs WHERE temario=?", (temario,))]
     if qp(req, "doc"):
         docs = [qp(req, "doc")]
@@ -192,6 +196,77 @@ def fichas_list(req, body):
 
 def fichas_review(req, body):
     return fichas.review(int(req.path_params["fid"]), bool(body.get("ok")))
+
+
+# ---------------------------------------------------------------- supuesto práctico
+def sp_overview(req, body):
+    return supuestos.overview(qp(req, "bloque"))
+
+
+def sp_extract(req, body):
+    if not db.load_config().get("gemini_api_key"):
+        raise ValueError("Configura primero la API key de Gemini")
+    n = supuestos.extract_some(int(body.get("k", 2)), background=False)
+    return {"created": n, **supuestos.overview()}
+
+
+def sp_generate(req, body):
+    return supuestos.generate_case(body.get("bloque") or db.load_config().get("sp_bloque", "III"))
+
+
+def sp_case(req, body):
+    c = supuestos._case(int(req.path_params["cid"]))
+    if not c:
+        raise KeyError("supuesto")
+    return c
+
+
+def sp_start(req, body):
+    return supuestos.start(int(body["case_id"]))
+
+
+def sp_get(req, body):
+    return supuestos.get(int(req.path_params["aid"]))
+
+
+def sp_save(req, body):
+    return supuestos.save(int(req.path_params["aid"]), body.get("answers") or {})
+
+
+def sp_image(req, body):
+    return supuestos.add_image(int(req.path_params["aid"]), int(body.get("n", 1)), body.get("data") or "")
+
+
+def sp_image_del(req, body):
+    return supuestos.del_image(int(req.path_params["aid"]), int(body.get("n", 1)), body.get("name") or "")
+
+
+def sp_image_get(req, body):
+    return FileResponse(supuestos.image_path(int(req.path_params["aid"]), req.path_params["name"]), media_type="image/jpeg")
+
+
+def sp_finish(req, body):
+    return supuestos.finish(int(req.path_params["aid"]))
+
+
+# ---------------------------------------------------------------- leyes
+def laws_list(req, body):
+    return leyes.overview(qp(req, "temario"))
+
+
+def law_articles(req, body):
+    return leyes.articles(req.path_params["lid"], qp(req, "q"))
+
+
+def law_generate(req, body):
+    if not db.load_config().get("gemini_api_key"):
+        raise ValueError("Configura primero la API key de Gemini")
+    n = leyes.generate(req.path_params["lid"], int(body.get("n", 8)), background=False)
+    return {"created": n}
+
+
+def law_fetch(req, body):
+    return {"articles": leyes.fetch(req.path_params["lid"])}
 
 
 def fichas_generate(req, body):
@@ -301,7 +376,8 @@ def notif_list(req, body):
 SETTINGS_KEYS = ["gemini_model", "gemini_fallback_models", "daily_goal", "daily_new_questions", "daily_gen_hour",
                  "review_reminder_hour", "goal_reminder_hour", "default_escala", "ai_prefetch_daily", "net_prefetch_daily",
                  "batch_enabled", "batch_max_requests", "batch_model", "batch_net_nightly", "batch_start_hour", "batch_end_hour",
-                 "fichas_daily_requests", "sim_questions", "sim_minutes", "target_retention"]
+                 "fichas_daily_requests", "sim_questions", "sim_minutes", "target_retention",
+                 "sp_bloque", "sp_minutes", "sp_extract_daily", "leyes_daily_requests"]
 
 
 def settings_get(req, body):
@@ -327,7 +403,8 @@ def settings_save(req, body):
             v = body[k]
             if k in ("daily_goal", "daily_new_questions", "daily_gen_hour", "review_reminder_hour", "goal_reminder_hour",
                      "ai_prefetch_daily", "net_prefetch_daily", "batch_max_requests", "batch_net_nightly",
-                     "batch_start_hour", "batch_end_hour", "fichas_daily_requests", "sim_questions", "sim_minutes"):
+                     "batch_start_hour", "batch_end_hour", "fichas_daily_requests", "sim_questions", "sim_minutes",
+                     "sp_minutes", "sp_extract_daily", "leyes_daily_requests"):
                 v = int(v)
             if k == "target_retention":
                 v = max(0.75, min(0.97, float(v)))
@@ -448,6 +525,21 @@ routes = [
     R("/api/mapa", mapa),
     R("/api/widget", widget_data),
     R("/api/fichas", fichas_list),
+    R("/api/sp", sp_overview),
+    R("/api/sp/extract", sp_extract, ["POST"]),
+    R("/api/sp/generate", sp_generate, ["POST"]),
+    R("/api/sp/case/{cid:int}", sp_case),
+    R("/api/sp/start", sp_start, ["POST"]),
+    R("/api/sp/a/{aid:int}", sp_get),
+    R("/api/sp/a/{aid:int}/save", sp_save, ["POST"]),
+    R("/api/sp/a/{aid:int}/image", sp_image, ["POST"]),
+    R("/api/sp/a/{aid:int}/image/del", sp_image_del, ["POST"]),
+    R("/api/sp/a/{aid:int}/img/{name}", sp_image_get),
+    R("/api/sp/a/{aid:int}/finish", sp_finish, ["POST"]),
+    R("/api/leyes", laws_list),
+    R("/api/leyes/{lid}", law_articles),
+    R("/api/leyes/{lid}/generate", law_generate, ["POST"]),
+    R("/api/leyes/{lid}/fetch", law_fetch, ["POST"]),
     R("/api/fichas/generate", fichas_generate, ["POST"]),
     R("/api/fichas/{fid:int}/review", fichas_review, ["POST"]),
     R("/api/failed", failed),

@@ -9,6 +9,8 @@ Plataforma de **tests de aprendizaje continuo** para las oposiciones TIC de la A
 - **Simulacro de examen**: 100 preguntas repartidas por bloques, cuenta atrás de 90 minutos, corrección automática al agotarse el tiempo y nota por bloque.
 - **Fichas de conceptos**: la IA convierte cada fallada en una tarjeta con el dato clave, generada en lotes en segundo plano y repasada con FSRS.
 - **Mapa de temas**: dominio y olvido por tema en una cuadrícula de colores; los tests rápidos priorizan los temas débiles.
+- **Supuesto práctico**: catálogo de supuestos extraído por IA de los PDF de preparación, redacción con cuenta atrás y fotos de diagramas, y corrección con los criterios oficiales del INAP (rúbrica de 50 puntos) apoyada en soluciones de referencia y apuntes indexados.
+- **Leyes por artículos**: descarga del texto consolidado vigente desde la API de datos abiertos del BOE, troceo por artículos y preguntas literales generadas por IA con cita del artículo.
 - **Modo 5 minutos y widget de Android** con el progreso del día y acceso directo a una sesión corta.
 - **Revisión con tres fuentes** en cada pregunta: fragmentos del temario con las palabras resaltadas, resultados de búsqueda y una explicación generada por IA que valida la respuesta del banco.
 - **Preguntas nuevas con IA (Gemini)** a partir del temario y de tus fallos, centradas en los temas que peor llevas. Cada pregunta generada pasa por un segundo modelo que la resuelve a ciegas y descarta las ambiguas o demasiado fáciles.

@@ -22,6 +22,9 @@ import android.widget.FrameLayout;
 public class MainActivity extends Activity {
     private WebView web;
     private FrameLayout root;
+    private android.webkit.ValueCallback<Uri[]> fileCb;
+    private Uri cameraUri;
+    private static final int REQ_FILE = 7;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable foregroundPoll = new Runnable() {
         @Override public void run() {
@@ -54,7 +57,32 @@ public class MainActivity extends Activity {
         ws.setMediaPlaybackRequiresUserGesture(true);
         ws.setUserAgentString(ws.getUserAgentString() + " OpoTestApp/1.0");
         web.addJavascriptInterface(new Bridge(), "Android");
-        web.setWebChromeClient(new WebChromeClient());
+        web.setWebChromeClient(new WebChromeClient() {
+            // Para adjuntar fotos (respuestas a mano del supuesto práctico): galería, archivos o cámara
+            @Override
+            public boolean onShowFileChooser(WebView v, android.webkit.ValueCallback<Uri[]> cb, FileChooserParams params) {
+                if (fileCb != null) fileCb.onReceiveValue(null);
+                fileCb = cb;
+                Intent pick = params.createIntent();
+                pick.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, params.getMode() == FileChooserParams.MODE_OPEN_MULTIPLE);
+                Intent chooser = Intent.createChooser(pick, "Añadir foto");
+                try {
+                    android.content.ContentValues cv = new android.content.ContentValues();
+                    cv.put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, "opotest_" + System.currentTimeMillis() + ".jpg");
+                    cv.put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+                    cameraUri = getContentResolver().insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
+                    if (cameraUri != null) {
+                        Intent cam = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                        cam.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, cameraUri);
+                        cam.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cam});
+                    }
+                } catch (Exception e) { cameraUri = null; }
+                try { startActivityForResult(chooser, REQ_FILE); }
+                catch (Exception e) { fileCb = null; return false; }
+                return true;
+            }
+        });
         web.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest req) {
@@ -103,6 +131,30 @@ public class MainActivity extends Activity {
 
     private void openExternal(String url) {
         try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); } catch (Exception ignored) { }
+    }
+
+    @Override
+    protected void onActivityResult(int req, int res, Intent data) {
+        super.onActivityResult(req, res, data);
+        if (req != REQ_FILE || fileCb == null) return;
+        Uri[] out = null;
+        if (res == RESULT_OK) {
+            if (data != null && data.getClipData() != null) {
+                int n = data.getClipData().getItemCount();
+                out = new Uri[n];
+                for (int i = 0; i < n; i++) out[i] = data.getClipData().getItemAt(i).getUri();
+            } else if (data != null && data.getData() != null) {
+                out = new Uri[]{data.getData()};
+            } else if (cameraUri != null) {
+                out = new Uri[]{cameraUri};          // foto hecha con la cámara
+            }
+        }
+        if ((out == null || out[0] != cameraUri) && cameraUri != null) {
+            try { getContentResolver().delete(cameraUri, null, null); } catch (Exception ignored) { }
+        }
+        fileCb.onReceiveValue(out);
+        fileCb = null;
+        cameraUri = null;
     }
 
     @Override protected void onResume() { super.onResume(); handler.post(foregroundPoll); }
@@ -159,6 +211,6 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void reload() {
             runOnUiThread(() -> web.loadUrl(Prefs.url(MainActivity.this) + "/"));
         }
-        @JavascriptInterface public String version() { return "1.1.1"; }
+        @JavascriptInterface public String version() { return "1.2.0"; }
     }
 }
