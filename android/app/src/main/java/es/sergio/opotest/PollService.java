@@ -8,6 +8,7 @@ public class PollService extends JobService {
     public boolean onStartJob(JobParameters params) {
         new Thread(() -> {
             Poller.poll(getApplicationContext());
+            OpoWidget.refresh(getApplicationContext());
             jobFinished(params, false);
         }).start();
         return true;

@@ -103,12 +103,21 @@ public class MainActivity extends Activity {
     }
 
     @Override protected void onResume() { super.onResume(); handler.post(foregroundPoll); }
-    @Override protected void onPause() { super.onPause(); handler.removeCallbacks(foregroundPoll); }
+    @Override protected void onPause() {
+        super.onPause();
+        handler.removeCallbacks(foregroundPoll);
+        OpoWidget.refreshAsync(this);      // el widget refleja lo que acabas de hacer
+    }
 
     @Override
     public void onBackPressed() {
-        if (web != null && web.canGoBack()) web.goBack();
-        else super.onBackPressed();
+        if (web == null) { super.onBackPressed(); return; }
+        // Si hay un test a medias, la web pregunta antes de salir
+        web.evaluateJavascript("(window.opoBack && window.opoBack()) ? 'yes' : 'no'", v -> {
+            if (v != null && v.contains("yes")) return;
+            if (web.canGoBack()) web.goBack();
+            else finish();
+        });
     }
 
     final class Bridge {
@@ -122,6 +131,6 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void reload() {
             runOnUiThread(() -> web.loadUrl(Prefs.url(MainActivity.this) + "/"));
         }
-        @JavascriptInterface public String version() { return "1.0.0"; }
+        @JavascriptInterface public String version() { return "1.1.0"; }
     }
 }

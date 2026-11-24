@@ -5,7 +5,11 @@ Plataforma de **tests de aprendizaje continuo** para las oposiciones TIC de la A
 ## Qué hace
 
 - **Tests configurables** por temario, bloque, tema, escala y origen, con corrección al momento o al final y penalización por fallo como en el examen real.
-- **Repaso espaciado**: cada pregunta fallada vuelve a los 1, 3, 7, 15 y 30 días, con aviso cuando hay repasos pendientes.
+- **Repaso inteligente (FSRS)**: cada fallada vuelve justo antes de que se olvide, con intervalos que crecen al acertar y retención objetivo configurable.
+- **Simulacro de examen**: 100 preguntas repartidas por bloques, cuenta atrás de 90 minutos, corrección automática al agotarse el tiempo y nota por bloque.
+- **Fichas de conceptos**: la IA convierte cada fallada en una tarjeta con el dato clave, generada en lotes en segundo plano y repasada con FSRS.
+- **Mapa de temas**: dominio y olvido por tema en una cuadrícula de colores; los tests rápidos priorizan los temas débiles.
+- **Modo 5 minutos y widget de Android** con el progreso del día y acceso directo a una sesión corta.
 - **Revisión con tres fuentes** en cada pregunta: fragmentos del temario con las palabras resaltadas, resultados de búsqueda y una explicación generada por IA que valida la respuesta del banco.
 - **Preguntas nuevas con IA (Gemini)** a partir del temario y de tus fallos, centradas en los temas que peor llevas. Cada pregunta generada pasa por un segundo modelo que la resuelve a ciegas y descarta las ambiguas o demasiado fáciles.
 - **Dificultad adaptativa**: el nivel de las preguntas de IA sube o baja según tu rendimiento.

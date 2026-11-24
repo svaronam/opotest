@@ -17,10 +17,25 @@ DEFAULT_CONFIG = {
     "gemini_fallback_models": ["gemini-3.6-flash", "gemini-3.5-flash-lite"],
     "daily_goal": 50,             # mínimo diario de preguntas
     "daily_new_questions": 20,    # preguntas nuevas generadas cada día
+    "ai_prefetch_daily": 15,      # explicaciones de IA preparadas por adelantado al día
+    "net_prefetch_daily": 20,     # búsquedas de Internet preparadas por adelantado al día (con Tavily)
+    "tavily_api_key": "",         # búsqueda web con 1.000 consultas gratis al mes (app.tavily.com)
+    "tavily_monthly": 1000,
+    "tavily_reserve": 300,        # consultas del mes que la precarga no toca (para tus búsquedas)
+    "batch_enabled": True,        # lote nocturno: recorre todo el banco aprovechando la cuota sobrante
+    "batch_start_hour": 1,
+    "batch_end_hour": 8,          # la cuota gratuita de Gemini se renueva a las 9:00 en España
+    "batch_max_requests": 100,    # peticiones por noche (10 preguntas cada una)
+    "batch_model": "",            # vacío = el modelo «lite» de reserva
+    "batch_net_nightly": 10,      # búsquedas de Internet extra por noche (con Tavily)
     "daily_gen_hour": 7,          # hora de la generación diaria
     "review_reminder_hour": 9,    # aviso de falladas pendientes
     "goal_reminder_hour": 20,     # aviso si no se ha llegado al mínimo
     "default_escala": "A2",
+    "target_retention": 0.9,      # FSRS: probabilidad de acordarte con la que se programa el repaso
+    "fichas_daily_requests": 6,   # peticiones de fichas al día (10 fichas cada una)
+    "sim_questions": 100,         # simulacro GSI: 100 preguntas, 90 minutos, A − E/3
+    "sim_minutes": 90,
     "api_token": "",              # opcional: si se define, la app debe enviarlo
     "timezone": "Europe/Madrid",
 }
@@ -129,6 +144,18 @@ CREATE TABLE IF NOT EXISTS gen_jobs (
 CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT);
 """
 
+EXTRA_SCHEMA = """
+CREATE TABLE IF NOT EXISTS fichas (
+  id INTEGER PRIMARY KEY,
+  question_id INTEGER UNIQUE,
+  doc_id TEXT,
+  concepto TEXT, texto TEXT,
+  created_at TEXT DEFAULT (datetime('now','localtime')),
+  stability REAL, difficulty REAL, last_review TEXT, due TEXT, reps INTEGER DEFAULT 0, lapses INTEGER DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS fichas_due ON fichas(due);
+"""
+
 _local = threading.local()
 
 
@@ -153,7 +180,14 @@ def init():
     for col, typ in (("rating", "TEXT"), ("rated_at", "TEXT"), ("difficulty", "INTEGER")):
         if col not in cols:
             c.execute(f"ALTER TABLE questions ADD COLUMN {col} {typ}")
+    tcols = [r[1] for r in c.execute("PRAGMA table_info(tests)")]
+    for col, typ in (("time_limit", "INTEGER"), ("started_at", "TEXT"), ("meta", "TEXT")):
+        if col not in tcols:
+            c.execute(f"ALTER TABLE tests ADD COLUMN {col} {typ}")
+    c.executescript(EXTRA_SCHEMA)
     c.commit()
+    import srs
+    srs.migrate()
 
 
 def q(sql, args=()):

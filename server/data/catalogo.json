@@ -10,10 +10,10 @@
   "B4": "B.IV Redes, comunicaciones e Internet"
  },
  "bloques_a2": {
-  "1": "I. Organización del Estado y Administración electrónica",
-  "2": "II. Tecnología básica",
-  "3": "III. Desarrollo de sistemas",
-  "4": "IV. Sistemas y comunicaciones"
+  "I": "I. Organización del Estado y Administración electrónica",
+  "II": "II. Tecnología básica",
+  "III": "III. Desarrollo de sistemas",
+  "IV": "IV. Sistemas y comunicaciones"
  },
  "docs": [
   {

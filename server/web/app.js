@@ -13,11 +13,18 @@ const L = ["a", "b", "c", "d"];
 
 async function api(path, opts = {}) {
   const o = { method: opts.method || (opts.body ? "POST" : "GET"), headers: {} };
+  const ctrl = new AbortController(); o.signal = ctrl.signal;
+  const tmr = setTimeout(() => ctrl.abort(), opts.timeout || 90000);
   if (opts.body) { o.body = JSON.stringify(opts.body); o.headers["Content-Type"] = "application/json"; }
   if (token()) o.headers["X-Token"] = token();
   let r;
   try { r = await fetch("/api" + path, o); }
-  catch (e) { throw new Error("Sin conexión con la Raspberry. Comprueba que Tailscale está activo."); }
+  catch (e) {
+    clearTimeout(tmr);
+    if (e.name === "AbortError") throw new Error("La Raspberry tarda demasiado en responder. Inténtalo de nuevo en un momento.");
+    throw new Error("Sin conexión con la Raspberry. Comprueba que Tailscale está activo.");
+  }
+  clearTimeout(tmr);
   const data = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(data.error || ("Error " + r.status));
   return data;
@@ -39,7 +46,7 @@ function modal(html, onMount) {
   return m;
 }
 function topbar(title, { back = false, right = "" } = {}) {
-  return `<header class="top">${back ? `<button class="back" aria-label="Volver" onclick="history.back()">‹</button>` : ""}<h1>${esc(title)}</h1>${right}</header>`;
+  return `<header class="top">${back ? `<button class="back" aria-label="Volver" onclick="goBack()">‹</button>` : ""}<h1>${esc(title)}</h1>${right}</header>`;
 }
 const loading = () => `<div class="empty"><span class="spinner"></span></div>`;
 const errBox = (e) => `<main><div class="empty err">${esc(e.message || e)}</div></main>`;
@@ -59,15 +66,55 @@ const routes = [];
 const route = (re, fn, tab) => routes.push({ re, fn, tab });
 let homeCache = null;
 
+/* Salir de un test sin terminar: se pide confirmación (enlaces, botón ‹, atrás del navegador y de Android) */
+let guard = null;          // { hash, sim, onFinish }
+let tickTimer = null;
+function askExit(go) {
+  if (!guard) return go();
+  const g = guard;
+  modal(`<h2>¿Salir del test?</h2>
+    <p class="small muted">${g.sim ? "Es un simulacro: <b>el tiempo sigue corriendo</b> aunque salgas. Cuando se acabe, se corregirá solo con lo que hayas respondido." : "Tus respuestas se guardan y podrás seguir donde lo dejaste desde «Hoy»."}</p>
+    <div class="stack" style="margin-top:14px"><button class="btn block" id="stay">Seguir con el test</button>
+    <button class="btn ghost block" id="fin">${g.exam ? "Corregir ahora" : "Terminar ahora"}</button>
+    <button class="btn quiet block" id="out">Salir sin terminar</button></div>`, (box, close) => {
+    box.querySelector("#stay").onclick = close;
+    box.querySelector("#out").onclick = () => { close(); guard = null; go(); };
+    box.querySelector("#fin").onclick = () => { close(); g.onFinish && g.onFinish(); };
+  });
+}
+function goBack() { askExit(() => history.back()); }
+window.opoBack = () => {               // lo llama la APK al pulsar «atrás»
+  if (document.querySelector(".sheetmodal")) { document.querySelectorAll(".sheetmodal").forEach((m) => m.remove()); return true; }
+  if (!guard) return false;
+  askExit(() => history.length > 1 ? history.back() : (location.hash = "#/"));
+  return true;
+};
+document.addEventListener("click", (e) => {
+  const a = e.target.closest && e.target.closest('a[href^="#"]');
+  if (!a || !guard || a.getAttribute("href") === guard.hash) return;
+  e.preventDefault();
+  const to = a.getAttribute("href");
+  askExit(() => { location.hash = to; });
+}, true);
+
 async function render() {
   const h = location.hash.replace(/^#/, "") || "/";
+  document.querySelectorAll(".sheetmodal").forEach((m) => m.remove());
+  if (guard && "#" + h !== guard.hash) {          // atrás del navegador: se vuelve al test y se pregunta
+    const to = location.hash;
+    history.pushState(null, "", guard.hash);
+    askExit(() => { location.hash = to; });
+    return;
+  }
+  guard = null;
+  if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
   document.body.classList.remove("testing");
   for (const r of routes) {
     const m = h.match(r.re);
     if (m) {
       document.querySelectorAll("#tabs a").forEach((a) => a.classList.toggle("on", a.dataset.tab === r.tab));
       window.scrollTo(0, 0);
-      try { await r.fn(...m.slice(1).map(decodeURIComponent)); }
+      try { await r.fn(...m.slice(1).map((x) => (x === undefined ? undefined : decodeURIComponent(x)))); }
       catch (e) { console.error(e); $app.innerHTML = topbar("OpoTest") + errBox(e); }
       refreshBadge();
       return;
@@ -106,11 +153,14 @@ route(/^\/$/, async () => {
         ${pct != null ? ` Aciertas el ${pct}% hoy.` : ""} ${d.streak ? ` Racha: ${d.streak} día${d.streak > 1 ? "s" : ""}.` : ""}</p>
     </section>
     <section class="todo">
-      ${d.open_test ? `<a href="#/t/${d.open_test.id}" class="hot"><span class="n">›</span><span class="t"><b>Seguir con el test</b><span>${esc(d.open_test.title)} · ${d.open_test.n} preguntas</span></span></a>` : ""}
+      ${d.open_test ? `<a href="#/t/${d.open_test.id}" class="hot"><span class="n">›</span><span class="t"><b>${d.open_test.kind === "simulacro" ? "Seguir con el simulacro" : "Seguir con el test"}</b><span>${esc(d.open_test.title)} · ${d.open_test.n} preguntas${d.open_test.kind === "simulacro" ? " · el tiempo corre" : ""}</span></span></a>` : ""}
+      <a href="#/test/5min" class="five"><span class="n">5′</span><span class="t"><b>Modo 5 minutos</b><span>10 preguntas: falladas de hoy y tus temas más flojos</span></span></a>
       <a href="#/test/repaso" class="${d.review_due ? "hot" : ""}"><span class="n ${d.review_due ? "" : "zero"}">${d.review_due}</span><span class="t"><b>Falladas por repasar</b><span>${d.review_due ? "Toca repasarlas hoy" : d.review_total ? `${d.review_total} en seguimiento, ninguna para hoy` : "Aún no hay fallos que repasar"}</span></span></a>
       <a href="#/test/nuevas" class="${d.new_questions ? "hot" : ""}"><span class="n ${d.new_questions ? "" : "zero"}">${d.new_questions}</span><span class="t"><b>Preguntas nuevas</b><span>${d.new_questions ? "Generadas con IA, sin hacer" : "Se generan cada mañana"}</span></span></a>
-      <a href="#/test/rapido"><span class="n">20</span><span class="t"><b>Test rápido</b><span>Aleatorias, priorizando las que no has visto</span></span></a>
+      <a href="#/fichas" class="${d.fichas_due ? "hot" : ""}"><span class="n ${d.fichas_due ? "" : "zero"}">${d.fichas_due}</span><span class="t"><b>Fichas de conceptos</b><span>${d.fichas_due ? "Tarjetas por repasar hoy" : "Se crean solas a partir de tus fallos"}</span></span></a>
+      <a href="#/test/rapido"><span class="n">20</span><span class="t"><b>Test rápido</b><span>Prioriza tus temas débiles y lo que tienes olvidado</span></span></a>
     </section>
+    <section class="row wrap"><a class="btn ghost grow" href="#/simulacro">Simulacro GSI</a><a class="btn ghost grow" href="#/mapa">Mapa de temas</a></section>
     ${!d.ai_ready ? `<section class="sheet"><h3>Activa la IA</h3><p class="small muted">Para generar preguntas nuevas y explicaciones, añade tu API key de Gemini.</p><a class="btn small" href="#/ajustes">Ir a ajustes</a></section>` : ""}
     ${tem.work || tem.nopdf ? `<section class="small muted">Temario: ${tem.ok} de ${tem.n} documentos indexados${tem.work ? ", leyendo escaneados con OCR" : ""}${tem.nopdf ? `, ${tem.nopdf} sin PDF en la Raspberry` : ""}.</section>` : ""}
     <section class="row"><a class="btn quiet small" href="#/historial">${ICON.hist} Historial</a><span class="grow"></span><span class="tiny">${d.total_questions.toLocaleString("es-ES")} preguntas · ${d.ia_questions} de IA</span></section>
@@ -122,11 +172,12 @@ const defaultCfg = { temario: "", bloques: [], temas: [], escalas: [], origen: "
 let catalog = null;
 async function getCatalog() { if (!catalog) catalog = await api("/catalog"); return catalog; }
 
-route(/^\/test\/(repaso|nuevas|rapido)$/, async (kind) => {
+route(/^\/test\/(repaso|nuevas|rapido|5min)$/, async (kind) => {
   $app.innerHTML = topbar("Preparando test", { back: true }) + loading();
   try {
-    const body = kind === "rapido" ? { kind: "normal", n: 20, filters: { priorizar_no_vistas: true }, title: "Test rápido" } : { kind, n: kind === "repaso" ? 100 : 50 };
-    const t = await api("/tests", { body });
+    const t = kind === "rapido" ? await api("/quick", { body: { n: 20, title: "Test rápido" } })
+      : kind === "5min" ? await api("/quick", { body: { n: 10 } })
+      : await api("/tests", { body: { kind, n: kind === "repaso" ? 100 : 50 } });
     location.replace("#/t/" + t.id);
   } catch (e) {
     $app.innerHTML = topbar(kind === "repaso" ? "Repaso" : "Nuevas", { back: true }) + `<main><div class="empty">${kind === "repaso" ? "No tienes falladas pendientes para hoy." : kind === "nuevas" ? "No hay preguntas nuevas sin hacer." : esc(e.message)}<br><a class="btn" href="#/test">Crear un test</a></div></main>`;
@@ -141,6 +192,7 @@ route(/^\/test$/, async () => {
     const blKeys = bl ? Object.keys(bl) : [];
     const temasTxt = cfg.temas.length ? `${cfg.temas.length} tema${cfg.temas.length > 1 ? "s" : ""} elegido${cfg.temas.length > 1 ? "s" : ""}` : "Todos los temas";
     $app.innerHTML = topbar("Nuevo test", { right: `<a class="iconbtn" href="#/historial" aria-label="Historial">${ICON.hist}</a>` }) + `<main>
+      <section class="row wrap"><a class="btn grow" href="#/simulacro">Simulacro GSI</a><a class="btn ghost grow" href="#/test/5min">5 minutos</a></section>
       <section class="sheet stack">
         <div><h3>Temario</h3><div class="chips" data-k="temario">
           ${[["", "Aleatorio"], ["A1", "A1 · CSSTIC"], ["A2", "A2 · GSI"]].map(([v, t]) => `<button class="chip" data-v="${v}" aria-pressed="${cfg.temario === v}">${t}</button>`).join("")}</div></div>
@@ -248,6 +300,15 @@ route(/^\/t\/(\d+)$/, async (id) => {
   pos = pos == null ? Math.max(0, t.items.findIndex((x) => x.chosen == null)) : +pos;
   let t0 = Date.now();
   document.body.classList.add("testing");
+  guard = { hash: "#/t/" + id, sim: t.kind === "simulacro", exam: t.mode === "examen", onFinish: () => finish(true) };
+  const deadline = t.time_left != null ? Date.now() + t.time_left * 1000 : null;
+  const clock = () => {
+    const el = document.getElementById("clock"); if (!deadline) return;
+    const left = Math.max(0, Math.round((deadline - Date.now()) / 1000));
+    if (el) { el.textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`; el.classList.toggle("low", left < 600); }
+    if (left <= 0 && guard) { clearInterval(tickTimer); tickTimer = null; toast("Se acabó el tiempo", 3500); finish(true); }
+  };
+  if (deadline) tickTimer = setInterval(clock, 1000);
 
   const answered = () => t.items.filter((x) => x.chosen != null).length;
   const draw = () => {
@@ -261,7 +322,7 @@ route(/^\/t\/(\d+)$/, async (id) => {
       it.a1_doc ? `<span class="tag">${temaLabel(it.a1_doc)}</span>` : "",
       it.a2_doc ? `<span class="tag">${temaLabel(it.a2_doc)}</span>` : "",
     ].join("");
-    $app.innerHTML = topbar(t.title || "Test", { back: true, right: `<button class="btn small quiet" id="nav">${pos + 1}/${t.n}</button>` }) + `<main>
+    $app.innerHTML = topbar(t.title || "Test", { back: true, right: `${deadline ? `<span class="clock" id="clock" aria-label="Tiempo restante"></span>` : ""}<button class="btn small quiet" id="nav">${pos + 1}/${t.n}</button>` }) + `<main>
       <div class="progress" aria-hidden="true"><i style="width:${(100 * answered()) / t.n}%"></i></div>
       <div class="qmeta">${tags}</div>
       <div class="qtext">${esc(it.text)}</div>
@@ -271,7 +332,7 @@ route(/^\/t\/(\d+)$/, async (id) => {
         else if (k === it.chosen) c = "sel";
         return `<button class="opt ${c}" data-k="${k}" role="radio" aria-checked="${k === it.chosen}" ${shown ? "disabled" : ""}><span class="bub">${k}</span><span class="txt">${esc(it[k])}</span></button>`;
       }).join("")}</div>
-      <div id="after">${shown ? afterAnswer(it) : t.mode === "practica" ? "" : `<p class="tiny" style="margin-top:12px">Modo examen: verás las soluciones al corregir. Acierto +1, fallo −1/3.</p>`}</div>
+      <div id="after">${shown ? afterAnswer(it) : t.mode === "practica" ? "" : `<p class="tiny" style="margin-top:12px">Modo examen: verás las soluciones al corregir. Acierto +1, fallo −1/3, en blanco 0.${it.chosen ? " Toca otra vez tu respuesta para dejarla en blanco." : ""}</p>`}</div>
     </main>
     <div class="testbar"><div class="in">
       <button class="btn quiet" id="prev" ${pos === 0 ? "disabled" : ""} aria-label="Anterior">‹</button>
@@ -283,21 +344,24 @@ route(/^\/t\/(\d+)$/, async (id) => {
     const fn = $app.querySelector("#fin"); fn && (fn.onclick = finish);
     $app.querySelector("#nav").onclick = navigator;
     if (shown) wireAfter(it);
+    clock();
   };
   async function choose(k) {
     const it = t.items[pos];
+    if (t.mode === "examen" && it.chosen === k) k = null;           // segunda pulsación: en blanco
     try {
       const r = await api(`/tests/${id}/answer`, { body: { pos, chosen: k, ms: Date.now() - t0 } });
       if (t.mode === "practica") Object.assign(it, r); else it.chosen = k;
       draw();
-      if (t.mode === "examen" && pos < t.n - 1) setTimeout(() => { pos++; t0 = Date.now(); draw(); }, 180);
+      if (t.mode === "examen" && k && pos < t.n - 1) setTimeout(() => { pos++; t0 = Date.now(); draw(); }, 180);
     } catch (e) { toast(e.message); }
   }
-  async function finish() {
+  async function finish(force) {
     const left = t.n - answered();
-    if (left && !confirm(`Te quedan ${left} sin responder. ¿Corregir igualmente?`)) return;
-    t = await api(`/tests/${id}/finish`, { body: {} });
+    if (!force && left && !confirm(`Te quedan ${left} sin responder. ¿Corregir igualmente?`)) return;
+    try { t = await api(`/tests/${id}/finish`, { body: {} }); } catch (e) { return toast(e.message); }
     sessionStorage.removeItem(key);
+    guard = null; if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
     results(t);
   }
   function navigator() {
@@ -319,16 +383,26 @@ function afterAnswer(it) {
     ${it.explanation ? `<div class="note expl">${esc(it.explanation)}</div>` : ""}
     ${it.comments ? `<p class="tiny" style="margin-top:8px">Fuente: ${esc(it.comments)}</p>` : ""}
     ${it.origin === "ia" ? rateBlock(it) : ""}
+    ${readyLine(it)}
     ${sourcesBlock(it)}`;
+}
+function readyLine(it) {
+  const r = it.ready || {};
+  const have = [r.ia && "IA", r.internet && "Internet"].filter(Boolean);
+  if (!have.length) return `<p class="tiny ready-line">Sin precargar: IA e Internet tardarán unos segundos.</p>`;
+  const miss = [!r.ia && "IA", !r.internet && "Internet"].filter(Boolean);
+  const txt = have.length > 1 ? "Precargadas las respuestas de IA e Internet" : `Precargada la respuesta de ${have[0]}`;
+  return `<p class="tiny ready-line"><span class="dot"></span>${txt}${miss.length ? ` · ${miss[0]} tardará unos segundos` : ""}.</p>`;
 }
 function rateBlock(it) {
   const b = (v, t) => `<button class="chip" data-rate="${v}" aria-pressed="${it.rating === v}">${t}</button>`;
   return `<div class="row wrap" data-rq="${it.id}" style="margin-top:10px"><span class="small muted">¿Nivel de examen?</span>
     ${b("facil", "Demasiado fácil")}${b("bien", "Nivel adecuado")}</div>`;
 }
+const readyDot = (it, k) => (it.ready && it.ready[k] ? `<span class="ready" title="Ya preparada: sale al instante">lista</span>` : "");
 function sourcesBlock(it) {
   return `<div class="srcs" data-q="${it.id}" data-ch="${it.chosen || ""}">
-      <button data-s="temario">${ICON.book}Temario</button><button data-s="internet">${ICON.web}Internet</button><button data-s="ia">${ICON.ai}IA</button></div>
+      <button data-s="temario">${ICON.book}Temario</button><button data-s="internet">${ICON.web}Internet${readyDot(it, "internet")}</button><button data-s="ia">${ICON.ai}IA${readyDot(it, "ia")}</button></div>
     <div class="srcpanel" id="sp-${it.id}"></div>
     <p style="margin-top:12px"><button class="btn quiet small" data-fix="${it.id}">La correcta es otra</button></p>`;
 }
@@ -360,11 +434,11 @@ function fixCorrect(it, cb) {
       catch (e) { toast(e.message); }
     })));
 }
-const hl = (s) => esc(s).replace(/\[\[/g, "<mark>").replace(/\]\]/g, "</mark>");
+const hl = (s) => esc(s).replace(/\{\{/g, '<mark class="ans">').replace(/\}\}/g, "</mark>").replace(/\[\[/g, "<mark>").replace(/\]\]/g, "</mark>");
 /* Enlace al tema que salta al párrafo del fragmento y lo resalta */
 function jumpHref(doc, page, snip) {
-  const terms = [...new Set([...(snip || "").matchAll(/\[\[(.+?)\]\]/g)].map((m) => m[1]))].slice(0, 12);
-  const passage = (snip || "").replace(/\[\[|\]\]/g, "").replace(/^…|…$/g, "").trim().slice(0, 400);
+  const terms = [...new Set([...(snip || "").matchAll(/\{\{(.+?)\}\}|\[\[(.+?)\]\]/g)].map((m) => m[1] || m[2]))].slice(0, 14);
+  const passage = (snip || "").replace(/\[\[|\]\]|\{\{|\}\}/g, "").replace(/^…|…$/g, "").trim().slice(0, 600);
   return `#/tema/${doc}/p/${page}/h/${encodeURIComponent(JSON.stringify({ t: terms, s: passage }))}`;
 }
 const reEsc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -382,16 +456,24 @@ function markPage(text, hlInfo) {
   return { html: esc(text.slice(0, a)) + `<mark class="jump" tabindex="-1">${terms(esc(text.slice(a, b)))}</mark>` + esc(text.slice(b)), found: true };
 }
 async function loadSource(it, which, el, refresh = false) {
+  const markReady = () => { it.ready = Object.assign({}, it.ready, { [which]: true }); };
   el.innerHTML = `<div class="sheet"><span class="spinner"></span> ${which === "ia" ? "Preguntando a la IA…" : which === "internet" ? "Buscando en Internet…" : "Buscando en el temario…"}</div>`;
   try {
-    const r = await api(`/questions/${it.id}/sources/${which}?chosen=${it.chosen || ""}${refresh ? "&refresh=1" : ""}`);
+    const r = await api(`/questions/${it.id}/sources/${which}?chosen=${it.chosen || ""}${refresh ? "&refresh=1" : ""}`, { timeout: which === "ia" ? 100000 : 45000 });
+    if (which !== "temario") markReady();
     if (which === "temario") {
-      el.innerHTML = `<div class="sheet">${r.hits.length ? r.hits.map((h) => `<div class="hit"><div class="where"><a href="${jumpHref(h.doc_id, h.page, h.snip)}">${h.temario} · ${h.temario === "A2" ? "Bloque " + h.bloque + ", " : ""}tema ${h.num} · pág. ${h.page}</a> — ${esc(h.title.slice(0, 70))}</div><div class="snip">${hl(h.snip)}</div></div>`).join("")
-        : `<p class="muted small">No hay coincidencias en el temario indexado (${r.indexed_pages} páginas).</p>`}</div>`;
+      const strong = r.hits.some((h) => h.has_answer);
+      el.innerHTML = `<div class="sheet">${r.hits.length ? (strong ? "" : `<p class="small muted" style="margin-bottom:6px">El temario no recoge la respuesta de forma literal; estos son los párrafos más relacionados. Contrasta con la IA o Internet.</p>`)
+        + r.hits.map((h) => `<div class="hit"><div class="where">${h.has_answer ? `<span class="tag ok">Contiene la respuesta</span> ` : ""}<a href="${jumpHref(h.doc_id, h.page, h.snip)}">${h.temario} · ${h.temario === "A2" ? "Bloque " + h.bloque + ", " : ""}tema ${h.num} · pág. ${h.page}</a> — ${esc(h.title.slice(0, 70))}</div><div class="snip">${hl(h.snip)}</div></div>`).join("")
+        : `<p class="muted small">No hay coincidencias en el temario indexado (${r.indexed_pages} páginas).</p>`}
+        ${r.negative ? `<p class="tiny" style="margin-top:6px">Pregunta en negativo: se muestran los párrafos donde aparecen las opciones que sí son ciertas.</p>` : ""}</div>`;
     } else if (which === "internet") {
-      el.innerHTML = `<div class="sheet">${r.results.length ? r.results.map((x) => `<div class="hit"><div class="where"><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a></div><div class="snip">${esc(x.snippet)}</div></div>`).join("")
-        : `<p class="muted small">No se obtuvieron resultados${r.errors && r.errors.length ? ": " + esc(r.errors.join("; ")) : ""}.</p>`}
-        <p class="tiny" style="margin-top:8px"><a href="${esc(r.search_url)}" target="_blank" rel="noopener">Buscar en el navegador</a></p></div>`;
+      const eng = (r.engines || []).filter(Boolean);
+      el.innerHTML = `<div class="sheet">${r.results.length ? r.results.map((x) => `<div class="hit"><div class="where"><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a>${x.engine ? ` <span class="tiny">· ${esc(x.engine)}</span>` : ""}</div><div class="snip">${esc(x.snippet)}</div></div>`).join("")
+        : `<p class="muted small">No he encontrado resultados que hablen de esta pregunta. Prueba con los enlaces de abajo.</p>`}
+        ${[...(r.notes || []), ...(r.errors || [])].length ? `<p class="tiny" style="margin-top:6px">Aviso: ${esc([...(r.notes || []), ...(r.errors || [])].join(" · "))}</p>` : ""}
+        <p class="tiny" style="margin-top:8px"><a href="${esc(r.search_url)}" target="_blank" rel="noopener">Buscar en Google</a> · <a href="${esc(r.wiki_url || "https://es.wikipedia.org")}" target="_blank" rel="noopener">Buscar en Wikipedia</a> · <a href="javascript:void 0" id="nr">Buscar de nuevo</a>${eng.length ? ` <span>· vía ${esc(eng.join(", "))}${r.cached ? " (precargado)" : ""}</span>` : ""}</p></div>`;
+      const nr = el.querySelector("#nr"); nr && (nr.onclick = () => loadSource(it, which, el, true));
     } else {
       const agree = r.coincide && r.respuesta_ia === r.respuesta_banco;
       el.innerHTML = `<div class="sheet"><div class="ai-head"><b>La IA marca la ${String(r.respuesta_ia).toUpperCase()}</b>
@@ -407,8 +489,20 @@ async function loadSource(it, which, el, refresh = false) {
 }
 
 /* resultados */
+const BLOQUES_GSI = { I: "Organización del Estado y AAPP", II: "Tecnología básica", III: "Desarrollo de sistemas", IV: "Sistemas y comunicaciones" };
+function simBlock(t) {
+  if (!t.breakdown) return "";
+  const rows = Object.entries(t.breakdown).filter(([, v]) => v.ok + v.ko + v.blank);
+  const hist = (t.history || []).filter((x) => x.nota10 != null);
+  return `<section><h2>Por bloque</h2><div class="sheet"><table class="tbl"><thead><tr><th>Bloque</th><th>✓</th><th>✗</th><th>–</th><th>Puntos</th></tr></thead><tbody>
+    ${rows.map(([b, v]) => `<tr><td><b>${b}</b> <span class="tiny">${esc(BLOQUES_GSI[b] || "")}</span></td><td>${v.ok}</td><td>${v.ko}</td><td>${v.blank}</td><td><b>${v.score}</b></td></tr>`).join("")}</tbody></table>
+    <p class="tiny" style="margin-top:8px">Puntos = aciertos − fallos/3. Los blancos no restan: si dudas entre más de dos opciones, en blanco suele salir a cuenta.</p></div></section>
+    ${hist.length > 1 ? `<section><h2>Tu evolución en simulacros</h2><div class="sheet">${barChart(hist.slice().reverse().map((x) => ({ label: x.finished_at, ok: x.ok, ko: x.ko, n: x.ok + x.ko })), { labels: (r) => new Date(r.label.replace(" ", "T")).toLocaleDateString("es-ES", { day: "numeric", month: "short" }) })}
+      <p class="small" style="margin-top:8px">Notas: ${hist.slice(0, 8).map((x) => `<b>${x.nota10.toFixed(2)}</b>`).join(" · ")}</p></div></section>` : ""}`;
+}
 function results(t) {
   document.body.classList.remove("testing");
+  guard = null;
   const total10 = t.n ? (Math.max(0, t.score) * 10 / t.n).toFixed(2) : "0";
   let filter = "ko";
   const draw = () => {
@@ -420,7 +514,8 @@ function results(t) {
         <p class="tiny" style="margin:10px 0 0;text-align:center">Puntuación ${t.score} (acierto +1, fallo −1/3) · ${fmtDate(t.finished_at)}</p></section>
       <section class="row wrap">
         ${t.ko + t.blank ? `<button class="btn grow" id="retry">Repetir los ${t.ko + t.blank} fallos</button>` : ""}
-        <a class="btn ghost grow" href="#/test">Otro test</a></section>
+        <a class="btn ghost grow" href="${t.kind === "simulacro" ? "#/simulacro" : "#/test"}">${t.kind === "simulacro" ? "Otro simulacro" : "Otro test"}</a></section>
+      ${simBlock(t)}
       <section><div class="seg" id="f"><button data-v="ko" aria-pressed="${filter === "ko"}">Fallos y blancos</button><button data-v="ok" aria-pressed="${filter === "ok"}">Aciertos</button><button data-v="all" aria-pressed="${filter === "all"}">Todas</button></div></section>
       <section class="reslist sheet">${items.length ? items.map((x) => `<div class="item" data-i="${x.pos}">
         <span class="mk ${x.is_correct === 1 ? "ok" : x.chosen == null ? "blank" : "ko"}">${x.is_correct === 1 ? "✓" : x.chosen == null ? "–" : "✗"}</span>
@@ -444,10 +539,9 @@ function results(t) {
 route(/^\/repaso$/, async () => {
   $app.innerHTML = topbar("Repaso") + loading();
   const r = await api("/failed?limit=200");
-  const boxes = ["mañana", "3 días", "1 semana", "2 semanas", "1 mes"];
   $app.innerHTML = topbar("Repaso") + `<main>
     <section class="sheet"><div class="count" style="font-size:2.2rem;font-weight:800;line-height:1">${r.due} <small class="muted" style="font-size:1rem;font-weight:600">para hoy</small></div>
-      <p class="small muted" style="margin:6px 0 12px">Cada fallada vuelve a los 1, 3, 7, 15 y 30 días. Si aciertas, sube de nivel; si fallas, vuelve al principio. ${r.total} en seguimiento.</p>
+      <p class="small muted" style="margin:6px 0 12px">Repaso inteligente: cada fallada vuelve justo antes de que se te olvide. Si la aciertas, el siguiente repaso se aleja (días, semanas, meses); si la vuelves a fallar, vuelve pronto. ${r.total} en seguimiento.</p>
       <div class="row wrap"><a class="btn grow ${r.due ? "" : "ghost"}" href="#/test/repaso">${r.due ? "Repasar ahora" : "Nada pendiente hoy"}</a>
       ${r.total ? `<button class="btn ghost grow" id="all">Test con todas las falladas</button>` : ""}</div></section>
     <section><h2>Falladas</h2><div class="sheet">${r.items.length ? r.items.map((x) => `<a class="list-item" href="#/q/${x.id}">
@@ -480,6 +574,7 @@ route(/^\/q\/(\d+)$/, async (id) => {
       <div class="opts">${L.filter((k) => q[k]).map((k) => `<div class="opt ${k === q.correct ? "right" : k === q.chosen ? "wrong" : ""}"><span class="bub">${k}</span><span class="txt">${esc(q[k])}</span></div>`).join("")}</div>
       ${q.explanation ? `<div class="note expl" style="margin-top:12px">${esc(q.explanation)}</div>` : ""}
       ${q.comments ? `<p class="tiny" style="margin-top:8px">Fuente: ${esc(q.comments)}</p>` : ""}
+      ${readyLine(q)}
       ${sourcesBlock(q)}
       <section><h3>Tus intentos</h3><p class="small">${q.attempts.length ? q.attempts.map((a) => `<span class="mk ${a.is_correct ? "ok" : "ko"}" style="display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;color:#fff;font-size:.75rem;margin:2px">${a.chosen.toUpperCase()}</span>`).join("") : "Nunca la has respondido."}</p>
         ${q.review && !q.review.mastered ? `<p class="tiny">Próximo repaso: ${q.review.due}</p>` : ""}</section>
@@ -586,10 +681,18 @@ route(/^\/pdf\/([^/]+)\/(\d+)(?:\/(resumen))?$/, async (id, page, res) => {
   if (isAndroid) $app.querySelector("#ext").onclick = (e) => { e.preventDefault(); window.Android.openExternal(location.origin + url); };
   try {
     if (!pdfjs) {
-      pdfjs = await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs");
-      pdfjs.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
+      const CDN = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/";
+      try {
+        pdfjs = await import("/static/vendor/pdf.min.mjs");
+        pdfjs.GlobalWorkerOptions.workerSrc = "/static/vendor/pdf.worker.min.mjs";
+      } catch (e) {
+        pdfjs = await import(CDN + "pdf.min.mjs");
+        pdfjs.GlobalWorkerOptions.workerSrc = CDN + "pdf.worker.min.mjs";
+      }
     }
-    const doc = await pdfjs.getDocument({ url, disableAutoFetch: true, rangeChunkSize: 1 << 20 }).promise;
+    const task = pdfjs.getDocument({ url, disableAutoFetch: true, rangeChunkSize: 1 << 20 });
+    task.onProgress = (ev) => { const pi = $app.querySelector("#pi"); if (pi && pi.textContent.startsWith("Cargando")) pi.textContent = `Cargando… ${(ev.loaded / 1e6).toFixed(1)} MB`; };
+    const doc = await task.promise;
     let p = Math.min(+page || 1, doc.numPages);
     const pw = $app.querySelector("#pw"), pi = $app.querySelector("#pi");
     const show = async () => {
@@ -643,6 +746,7 @@ route(/^\/stats$/, async () => {
     const rows = period === "dias" ? s.daily : period === "semanas" ? s.weekly : s.monthly;
     const lab = period === "dias" ? (r) => new Date(r.label).toLocaleDateString("es-ES", { day: "numeric", month: "short" }) : period === "semanas" ? (r) => "sem " + r.label.slice(5) : (r) => r.label;
     $app.innerHTML = topbar("Progreso") + `<main>
+      <section class="row wrap"><a class="btn ghost grow" href="#/mapa">Mapa de temas</a><a class="btn ghost grow" href="#/simulacro">Simulacros</a></section>
       <section class="kpis">
         <div class="sheet"><b>${T.answered.toLocaleString("es-ES")}</b><span>preguntas respondidas</span></div>
         <div class="sheet"><b>${pct}%</b><span>de acierto global</span></div>
@@ -667,6 +771,110 @@ route(/^\/stats$/, async () => {
   draw();
 }, "stats");
 
+/* ------------------------------------------------------------------ simulacro */
+route(/^\/simulacro$/, async () => {
+  $app.innerHTML = topbar("Simulacro GSI", { back: true }) + loading();
+  const [r, h] = await Promise.all([api("/simulacro"), api("/home")]);
+  const open = r.items.find((x) => !x.finished_at);
+  const done = r.items.filter((x) => x.finished_at);
+  const nq = Object.values(r.per_block).reduce((a, b) => a + b, 0);
+  $app.innerHTML = topbar("Simulacro GSI", { back: true }) + `<main>
+    <section class="sheet"><h2>Como el examen real</h2>
+      <p class="small muted">Primer ejercicio del GSI (ingreso libre): cuestionario de 4 opciones con una sola correcta, <b>acierto +1, fallo −1/3 y en blanco 0</b>. Con cuenta atrás y corrección al final; si se acaba el tiempo se corrige solo.</p>
+      <div class="kpis" style="margin:12px 0">${Object.entries(r.per_block).map(([b, n]) => `<div class="sheet"><b>${n}</b><span>Bloque ${b} · ${esc(BLOQUES_GSI[b] || "")}</span></div>`).join("")}</div>
+      <p class="tiny">${nq} preguntas, reparto proporcional al temario. Primero preguntas de exámenes oficiales y de escala A2, sin repetir las de tus simulacros del último mes. Ajusta preguntas y minutos en Ajustes.</p>
+      ${open ? `<a class="btn block" href="#/t/${open.id}">Seguir con el simulacro abierto</a>` : `<button class="btn block" id="go">Empezar simulacro</button>`}
+    </section>
+    ${done.length ? `<section><h2>Simulacros anteriores</h2><div class="sheet">${done.map((x) => `<a class="list-item" href="#/t/${x.id}"><div class="row"><b class="grow">${fmtDate(x.finished_at)}</b><b class="${pctClass(x.nota10 * 10)}">${x.nota10.toFixed(2)}</b></div>
+      <div class="tiny">${x.ok} aciertos · ${x.ko} fallos · ${x.blank} en blanco · ${x.score} puntos</div></a>`).join("")}</div></section>` : ""}
+  </main>`;
+  const go = $app.querySelector("#go");
+  go && (go.onclick = async () => {
+    if (h.open_test && h.open_test.kind !== "simulacro") { /* otro test abierto: no pasa nada, se puede volver luego */ }
+    go.disabled = true;
+    try { const t = await api("/simulacro", { body: {} }); location.hash = "#/t/" + t.id; }
+    catch (e) { toast(e.message); go.disabled = false; }
+  });
+}, "test");
+
+/* ------------------------------------------------------------------ mapa de temas */
+const LVL = { dominado: "Dominado", bien: "Bien", flojo: "Flojo", mal: "Mal", nuevo: "Sin datos" };
+route(/^\/mapa(?:\/(A1|A2))?$/, async (tem) => {
+  tem = tem || LS.get("mapa", "A2");
+  LS.set("mapa", tem);
+  $app.innerHTML = topbar("Mapa de temas", { back: true }) + loading();
+  const m = await api("/mapa?temario=" + tem);
+  const groups = {};
+  m.topics.forEach((x) => (groups[x.bloque] = groups[x.bloque] || []).push(x));
+  const S = m.summary;
+  $app.innerHTML = topbar("Mapa de temas", { back: true }) + `<main>
+    <section><div class="seg"><a class="segl" href="#/mapa/A2" aria-pressed="${tem === "A2"}">A2 · GSI</a><a class="segl" href="#/mapa/A1" aria-pressed="${tem === "A1"}">A1 · CSSTIC</a></div></section>
+    <section class="sheet"><div class="legend lv">${Object.keys(LVL).map((k) => `<span><i class="lv-${k}"></i>${LVL[k]} <b>${S[k] || 0}</b></span>`).join("")}<span><i class="lv-stale"></i>Olvidándose (+14 días)</span></div>
+      <p class="tiny" style="margin-top:6px">El test rápido, el modo 5 minutos y las preguntas nuevas de cada día salen sobre todo de los temas flojos y de los que llevas tiempo sin tocar. Toca un tema para practicarlo.</p></section>
+    ${Object.entries(groups).map(([b, xs]) => `<section><h2>${tem === "A2" ? "Bloque " + b + " · " + esc(BLOQUES_GSI[b] || "") : esc(b)}</h2>
+      <div class="tmap">${xs.map((x) => `<button class="tile lv-${x.level} ${x.stale ? "stale" : ""}" data-id="${esc(x.id)}" title="${esc(x.title)}"><b>${x.num}</b><span>${x.accuracy != null ? x.accuracy + "%" : "·"}</span>${x.due ? `<i class="dot" aria-label="falladas por repasar"></i>` : ""}</button>`).join("")}</div></section>`).join("")}
+  </main>`;
+  $app.querySelectorAll(".tile").forEach((b) => b.addEventListener("click", () => {
+    const x = m.topics.find((t) => t.id === b.dataset.id);
+    modal(`<p class="tiny">${temaLabel(x.id)} · <b>${LVL[x.level]}</b>${x.stale ? " · olvidándose" : ""}</p><h2>${esc(x.title)}</h2>
+      <p class="small muted">${x.answered ? `${x.answered} respuestas, ${x.accuracy}% de acierto · última vez hace ${x.days} día${x.days === 1 ? "" : "s"}` : "Aún no has respondido preguntas de este tema"}${x.due ? ` · ${x.due} falladas por repasar` : ""} · ${x.available} preguntas disponibles.</p>
+      <div class="stack" style="margin-top:12px"><button class="btn block" id="t20">Test de 20 de este tema</button>
+      <a class="btn ghost block" href="#/fichas/${encodeURIComponent(x.id)}">Fichas de este tema</a>
+      <a class="btn quiet block" href="#/tema/${encodeURIComponent(x.id)}">Abrir el temario</a></div>`, (box, close) => {
+      box.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
+      box.querySelector("#t20").onclick = async () => {
+        try { const t = await api("/tests", { body: { kind: "normal", n: 20, filters: { temario: tem, temas: [x.id], priorizar_no_vistas: true }, title: temaLabel(x.id) } }); close(); location.hash = "#/t/" + t.id; }
+        catch (e) { toast(e.message); }
+      };
+    });
+  }));
+}, "stats");
+
+/* ------------------------------------------------------------------ fichas */
+route(/^\/fichas(?:\/([^/]+))?$/, async (doc) => {
+  $app.innerHTML = topbar("Fichas", { back: true }) + loading();
+  let r = await api("/fichas?limit=60" + (doc ? "&doc=" + encodeURIComponent(doc) + "&all=1" : ""));
+  let i = 0, flipped = false, okN = 0, koN = 0;
+  const intro = () => `<section class="sheet"><p class="small muted">La IA convierte cada pregunta que fallas en una ficha con el dato exacto que hay que recordar. Se crean solas en segundo plano (${r.requests_today}/${r.cap} lotes hoy) y se repasan con el mismo sistema inteligente que las falladas.</p>
+    <p class="small">${r.total} fichas · ${r.due} por repasar hoy · ${r.pending} falladas aún sin ficha</p>
+    ${r.pending ? `<button class="btn ghost small" id="gen">Crear 10 fichas ahora</button> <span class="small" id="genst"></span>` : ""}</section>`;
+  const draw = () => {
+    const f = r.items[i];
+    if (!f) {
+      $app.innerHTML = topbar("Fichas", { back: true }) + `<main>${okN + koN ? `<section class="sheet goal done"><div class="count">${okN} <small>de ${okN + koN} sabidas</small></div><p class="small muted" style="margin:6px 0 0">Las que no sabías volverán pronto.</p></section>` : ""}
+        ${!r.items.length && !(okN + koN) ? `<div class="empty">${r.total ? "No tienes fichas por repasar hoy." : "Todavía no hay fichas."}</div>` : ""}
+        ${intro()}
+        ${r.by_doc && r.by_doc.length ? `<section><h2>Por tema</h2><div class="sheet">${r.by_doc.map((d) => `<a class="list-item" href="#/fichas/${encodeURIComponent(d.doc_id || "")}"><div class="small">${d.doc_id ? temaLabel(d.doc_id) + " · " + esc(d.title || "") : "Sin tema"}</div><div class="tiny">${d.n} fichas${d.due ? ` · <b style="color:var(--guide)">${d.due} hoy</b>` : ""}</div></a>`).join("")}</div></section>` : ""}
+      </main>`;
+      wireGen();
+      return;
+    }
+    $app.innerHTML = topbar(doc ? temaLabel(doc) : "Fichas", { back: true, right: `<span class="small muted">${i + 1}/${r.items.length}</span>` }) + `<main>
+      <div class="progress" aria-hidden="true"><i style="width:${(100 * i) / r.items.length}%"></i></div>
+      <button class="flash ${flipped ? "on" : ""}" id="card" aria-live="polite">
+        <span class="tiny">${f.doc_id ? temaLabel(f.doc_id) : ""}</span>
+        <b class="concept">${esc(f.concepto)}</b>
+        ${flipped ? `<span class="back">${esc(f.texto)}</span>` : `<span class="tiny">Piensa la respuesta y toca para darle la vuelta</span>`}
+      </button>
+      ${flipped ? `<div class="row" style="margin-top:14px"><button class="btn grow ko" id="no">No lo sabía</button><button class="btn grow okb" id="si">Lo sabía</button></div>
+        <p class="tiny" style="text-align:center;margin-top:10px"><a href="#/q/${f.question_id}">Ver la pregunta original</a></p>` : ""}
+    </main>`;
+    $app.querySelector("#card").onclick = () => { flipped = !flipped; draw(); };
+    const ans = async (ok) => { try { await api(`/fichas/${f.id}/review`, { body: { ok } }); ok ? okN++ : koN++; i++; flipped = false; draw(); } catch (e) { toast(e.message); } };
+    const no = $app.querySelector("#no"), si = $app.querySelector("#si");
+    no && (no.onclick = () => ans(false)); si && (si.onclick = () => ans(true));
+  };
+  function wireGen() {
+    const g = $app.querySelector("#gen"); if (!g) return;
+    g.onclick = async () => {
+      g.disabled = true; $app.querySelector("#genst").innerHTML = `<span class="spinner"></span>`;
+      try { const x = await api("/fichas/generate", { body: {}, timeout: 120000 }); toast(`${x.created} fichas nuevas`); r = await api("/fichas?limit=60"); i = 0; draw(); }
+      catch (e) { $app.querySelector("#genst").innerHTML = `<span class="err">${esc(e.message)}</span>`; g.disabled = false; }
+    };
+  }
+  draw();
+}, "repaso");
+
 /* ------------------------------------------------------------------ ajustes */
 route(/^\/ajustes$/, async () => {
   $app.innerHTML = topbar("Ajustes", { back: true }) + loading();
@@ -681,6 +889,15 @@ route(/^\/ajustes$/, async () => {
         <select data-k="gen_level">${[["auto", "Automática según tus resultados"], ["1", "1 · Como la media del examen"], ["2", "2 · Alta"], ["3", "3 · Muy alta"]]
           .map(([v, t]) => `<option value="${v}" ${(s.gen_level_auto ? "auto" : String(s.gen_level)) === v ? "selected" : ""}>${t}</option>`).join("")}</select></label>
       <label class="field"><span>Escala que preparas (para las preguntas diarias)</span><select data-k="default_escala">${["A1", "A2", "C1"].map((v) => `<option ${s.default_escala === v ? "selected" : ""}>${v}</option>`).join("")}</select></label>
+      ${num("ai_prefetch_daily", "Explicaciones de IA preparadas por adelantado al día (0 = ninguna)", 0, 200)}
+      ${num("net_prefetch_daily", "Búsquedas de Internet preparadas por adelantado al día (necesita clave de Tavily; 0 = ninguna)", 0, 500)}
+      <label class="field"><span>Lote nocturno (recorre todo el banco de ${String(s.batch_start_hour ?? 1).padStart(2, "0")}:00 a ${String(s.batch_end_hour ?? 8).padStart(2, "0")}:00 con la cuota sobrante)</span>
+        <select data-k="batch_enabled"><option value="1" ${s.batch_enabled !== false ? "selected" : ""}>Activado</option><option value="0" ${s.batch_enabled === false ? "selected" : ""}>Desactivado</option></select></label>
+      <div class="row">${num("batch_max_requests", "Peticiones por noche (10 preguntas cada una)", 0, 1000)}${num("batch_net_nightly", "Búsquedas extra por noche", 0, 1000)}</div>
+      <label class="field"><span>Modelo del lote (vacío = el «lite» de reserva)</span><input type="text" data-k="batch_model" value="${esc(s.batch_model || "")}"></label>
+      <label class="field"><span>Repaso inteligente: cuánto quieres recordar</span><select data-k="target_retention">${[["0.85", "85 % · menos repasos"], ["0.9", "90 % · equilibrado"], ["0.95", "95 % · más repasos, más seguro"]].map(([v, t]) => `<option value="${v}" ${Math.abs((s.target_retention ?? 0.9) - +v) < 0.001 ? "selected" : ""}>${t}</option>`).join("")}</select></label>
+      ${num("fichas_daily_requests", "Lotes de fichas al día (10 fichas cada uno; 0 = no crear)", 0, 50)}
+      <div class="row">${num("sim_questions", "Preguntas del simulacro", 10, 105)}${num("sim_minutes", "Minutos del simulacro", 5, 240)}</div>
       <div class="row">${num("daily_gen_hour", "Hora de generación", 0, 23)}${num("review_reminder_hour", "Aviso de repaso", 0, 23)}${num("goal_reminder_hour", "Aviso de mínimo", 0, 23)}</div>
     </section>
     <section class="sheet"><h2>Inteligencia artificial (Gemini)</h2>
@@ -690,7 +907,12 @@ route(/^\/ajustes$/, async () => {
       <label class="field"><span>Modelos de reserva (separados por comas)</span><input type="text" data-k="gemini_fallback_models" value="${esc((s.gemini_fallback_models || []).join(", "))}"></label>
       <div class="row"><button class="btn quiet grow" id="tai">Probar la IA</button></div><p class="small" id="taist"></p>
     </section>
+    <section class="sheet"><h2>Búsqueda en Internet (Tavily)</h2>
+      <p class="small muted">Sin clave, la app busca en DuckDuckGo y Wikipedia, pero DuckDuckGo bloquea a ratos las búsquedas automáticas. Con una clave gratuita de Tavily (app.tavily.com, 1.000 búsquedas al mes y sin tarjeta) las búsquedas son estables y se pueden precargar.</p>
+      <label class="field"><span>Clave de Tavily ${s.tavily_key_set ? `(guardada, acaba en ${esc(s.tavily_key_hint)} · ${s.tavily_used} usadas este mes)` : "(sin configurar)"}</span><input type="password" id="tkey" placeholder="${s.tavily_key_set ? "Déjala vacía para mantenerla; «-» para borrarla" : "tvly-…"}" autocomplete="off"></label>
+    </section>
     <section class="sheet"><h2>Avisos y aplicación</h2>
+      <div class="row wrap"><button class="btn quiet grow" id="dg">Diagnóstico</button></div><div id="dgo" class="small" style="margin:8px 0 12px"></div>
       <div class="row wrap"><button class="btn quiet grow" id="tn">Probar notificación</button>${isAndroid ? `<button class="btn quiet grow" id="srv">Cambiar servidor</button>` : ""}</div>
       <label class="field"><span>Tema de color</span><select id="theme">${[["auto", "Como el sistema"], ["light", "Claro"], ["dark", "Oscuro"]].map(([v, t]) => `<option value="${v}" ${theme === v ? "selected" : ""}>${t}</option>`).join("")}</select></label>
       <p class="tiny">Servidor: ${esc(location.host)} · temario en ${esc(s.temario_dir)}</p>
@@ -700,13 +922,38 @@ route(/^\/ajustes$/, async () => {
     const body = {};
     $app.querySelectorAll("[data-k]").forEach((el) => (body[el.dataset.k] = el.value));
     const key = $app.querySelector("#key").value.trim(); if (key) body.gemini_api_key = key;
+    const tkey = $app.querySelector("#tkey").value.trim(); if (tkey) body.tavily_api_key = tkey;
     try { await api("/settings", { body }); toast("Cambios guardados"); render(); } catch (e) { toast(e.message); }
   };
   $app.querySelector("#tai").onclick = async () => {
     const st = $app.querySelector("#taist"); st.innerHTML = `<span class="spinner"></span>`;
     const key = $app.querySelector("#key").value.trim();
-    try { if (key) await api("/settings", { body: { gemini_api_key: key } }); const r = await api("/settings/test_ai", { body: {} }); st.textContent = `Funciona (${r.model}).`; }
+    try {
+      if (key) await api("/settings", { body: { gemini_api_key: key } });
+      const r = await api("/settings/test_ai", { body: {}, timeout: 75000 });
+      st.innerHTML = `Funciona con <b>${esc(r.model)}</b>.${(r.notes || []).map((n) => " " + esc(n)).join("")}`;
+      const mi = $app.querySelector('[data-k="gemini_model"]'), fi = $app.querySelector('[data-k="gemini_fallback_models"]');
+      if (mi) mi.value = r.model; if (fi) fi.value = (r.fallbacks || []).join(", ");
+    }
     catch (e) { st.innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  };
+  $app.querySelector("#dg").onclick = async () => {
+    const o = $app.querySelector("#dgo"); o.innerHTML = `<span class="spinner"></span>`;
+    try {
+      const d = await api("/diag");
+      const busy = d.load && d.cpus && d.load[0] > d.cpus * 0.9;
+      o.innerHTML = `<p>Carga de la Pi: <b>${(d.load || []).join(" · ")}</b> (${d.cpus} núcleos)${busy ? ' <span class="err">— saturada</span>' : ""} · temperatura ${d.temp ?? "?"} °C · RAM libre ${d.mem_free_mb ?? "?"} MB · consulta al temario ${d.db_ms} ms</p>
+        <p>OCR: ${d.ocr.ok} de ${d.ocr.n} documentos listos${d.ocr.working ? ", procesando ahora" : ""}. Modelo: ${esc(d.model)}</p>
+        ${d.prefetch ? `<p style="margin-top:6px"><b>Preparadas por adelantado:</b> IA ${d.prefetch.ia_today}/${d.prefetch.ia_cap} hoy (${d.prefetch.ia_ready} guardadas, ${d.prefetch.ia_pending} en cola) · Internet ${d.prefetch.net_today}/${d.prefetch.net_cap} hoy (${d.prefetch.net_ready} guardadas, ${d.prefetch.net_pending} en cola)</p>` : ""}
+        ${d.night ? `<p style="margin-top:6px"><b>Banco precargado:</b> IA ${d.night.ia_ready.toLocaleString("es-ES")} de ${d.night.ia_total.toLocaleString("es-ES")} (${Math.round(100 * d.night.ia_ready / d.night.ia_total)}%) · Internet ${d.night.net_ready.toLocaleString("es-ES")} de ${d.night.net_total.toLocaleString("es-ES")} (${Math.round(100 * d.night.net_ready / d.night.net_total)}%)</p>
+          <p class="tiny">Lote nocturno ${d.night.enabled ? `activado (${d.night.hours}, modelo ${esc(d.night.model)})` : "desactivado"}${d.night.avg_per_night ? ` · media ${d.night.avg_per_night} por noche · faltan unos ${d.night.days_left} días` : " · aún sin noches completadas"}</p>` : ""}
+        ${d.search ? `<p style="margin-top:6px"><b>Búsqueda en Internet:</b> Tavily ${d.search.tavily_key ? `${d.search.tavily_month} consultas este mes` : "sin clave"}${["tavily", "duckduckgo", "wikipedia"].filter((e) => d.search[e].paused_until).map((e) => ` · <span class="err">${e} en pausa hasta las ${d.search[e].paused_until} (${esc(d.search[e].why)})</span>`).join("")}</p>` : ""}
+        <p style="margin-top:6px"><b>Peticiones a Gemini hoy:</b> ${Object.entries(d.usage || {}).filter(([k]) => !k.startsWith("_")).map(([k, v]) => `${esc(k)}: ${v}`).join(" · ") || "ninguna"}
+          ${Object.entries(d.usage || {}).filter(([k]) => k.startsWith("_")).map(([k, v]) => `<span class="tiny">(${esc(k.slice(1))}: ${v})</span>`).join(" ")}</p>
+        ${Object.keys(d.blocked || {}).length ? Object.entries(d.blocked).map(([m, b]) => `<p class="err tiny">${esc(m)}: ${esc(b.why)} — vuelve a las ${b.until}</p>`).join("") : ""}
+        ${d.gen_retry ? `<p class="tiny">La generación diaria se reintentará a las ${d.gen_retry}.</p>` : ""}
+        ${d.calls.length ? `<p style="margin-top:6px"><b>Últimas llamadas a la IA</b></p>` + d.calls.map((c) => `<div class="tiny">${c.when} · ${esc(c.kind)} · ${esc(c.model)} · <b>${c.secs} s</b> · ${c.ok ? "ok" : '<span class="err">' + esc(c.note) + "</span>"}</div>`).join("") : `<p class="tiny">Aún no hay llamadas registradas desde el último reinicio.</p>`}`;
+    } catch (e) { o.innerHTML = `<span class="err">${esc(e.message)}</span>`; }
   };
   $app.querySelector("#tn").onclick = async () => { await api("/notifications/test", { body: {} }); if (isAndroid) window.Android.checkNow(); toast(isAndroid ? "Enviada: debería llegar en unos segundos" : "Creada (las notificaciones llegan en la app del móvil)"); };
   const srv = $app.querySelector("#srv"); srv && (srv.onclick = () => window.Android.openSettings());

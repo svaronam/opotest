@@ -1,4 +1,4 @@
-# Instala OpoTest en la Raspberry desde el PC con Windows y copia el temario.
+﻿# Instala OpoTest en la Raspberry desde el PC con Windows y copia el temario.
 # Uso (PowerShell, en la carpeta del proyecto):
 #     powershell -ExecutionPolicy Bypass -File pc\instalar.ps1
 #     powershell -ExecutionPolicy Bypass -File pc\instalar.ps1 -SoloServidor   # actualizar el código sin recopiar el temario
@@ -30,7 +30,11 @@ Copiar $Repo @("server", "pi") "~/opotest"
 Paso "2/3 Instalando en la Raspberry"
 $envPuerto = if ($Puerto -gt 0) { "OPOTEST_PORT=$Puerto " } else { "" }
 ssh -t $Pi "${envPuerto}bash ~/opotest/pi/install.sh"
-if ($LASTEXITCODE -ne 0) { throw "La instalación falló" }
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "`nLa instalación falló (código $LASTEXITCODE). Estado de la Raspberry:" -ForegroundColor Red
+    ssh $Pi "echo '--- Espacio en disco'; df -h / ~ | sort -u; echo '--- Memoria'; free -m; echo '--- Carga y temperatura'; uptime; vcgencmd measure_temp 2>/dev/null; vcgencmd get_throttled 2>/dev/null; echo '--- Servicios'; systemctl is-active opotest opotest-ocr"
+    throw "La instalación falló"
+}
 
 if (-not $SoloServidor) {
     Paso "3/3 Copiando el temario (A1 unos 200 MB, A2 unos 12 GB: puede tardar)"

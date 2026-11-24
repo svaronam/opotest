@@ -39,6 +39,12 @@ else
   PORT=8790
   while port_taken "$PORT"; do PORT=$((PORT + 1)); done
 fi
+FREE_MB=$(df -Pm "$HOME" | awk 'NR==2{print $4}')
+if [ "${FREE_MB:-0}" -lt 300 ]; then
+  echo "ERROR: solo quedan ${FREE_MB} MB libres en la tarjeta. Libera espacio y vuelve a intentarlo."
+  df -h "$HOME"
+  exit 3
+fi
 echo "$PORT" > "$APP/port"
 
 echo "== OpoTest: instalando en $(hostname) como $USER_NAME (puerto $PORT) =="
@@ -56,7 +62,15 @@ fi
 "$APP/venv/bin/pip" install -q --upgrade pip
 "$APP/venv/bin/pip" install -q "starlette>=0.40" "uvicorn>=0.30"
 
-mkdir -p "$APP/temario/A1" "$APP/temario/A2" "$APP/server/var"
+mkdir -p "$APP/temario/A1" "$APP/temario/A2" "$APP/server/var" "$APP/server/web/vendor"
+
+echo "-> Visor de PDF (pdf.js) en local"
+PDFJS=https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38
+for f in pdf.min.mjs pdf.worker.min.mjs; do
+  if [ ! -s "$APP/server/web/vendor/$f" ]; then
+    curl -fsSL "$PDFJS/$f" -o "$APP/server/web/vendor/$f" || echo "   (no se pudo descargar $f; se usará el CDN)"
+  fi
+done
 
 echo "-> Cargando preguntas y catálogo de temas"
 cd "$APP/server"

@@ -4,13 +4,14 @@ import json
 import random
 import re
 import threading
+import time
 import traceback
 
 import db
 import gemini
 import importer
+import srs
 
-INTERVALS = [1, 3, 7, 15, 30]          # días entre repasos según la caja
 LETTERS = "abcd"
 
 
@@ -57,7 +58,9 @@ def docs_tree():
         d["answered"] = a[1] if a else 0
         d["accuracy"] = round(100 * a[0] / a[1]) if a and a[1] else None
         out[d["temario"]].append(d)
-    return {"docs": out, "bloques_a1": cat["bloques_a1"], "bloques_a2": cat["bloques_a2"]}
+    rom = {"1": "I", "2": "II", "3": "III", "4": "IV"}
+    bloques_a2 = {rom.get(str(k), str(k)): v for k, v in cat["bloques_a2"].items()}   # los temas usan números romanos
+    return {"docs": out, "bloques_a1": cat["bloques_a1"], "bloques_a2": bloques_a2}
 
 
 # ---------------------------------------------------------------- tests
@@ -115,7 +118,7 @@ def create_test(kind="normal", n=20, mode="practica", filters=None, title=None, 
     if question_ids is None:
         if kind == "repaso":
             ids = [r["question_id"] for r in db.q(
-                "SELECT question_id FROM review WHERE mastered=0 AND due<=? ORDER BY due, box LIMIT ?", (today(), n))]
+                "SELECT question_id FROM review WHERE mastered=0 AND due<=? ORDER BY due, stability LIMIT ?", (today(), n))]
             title = title or "Repaso de falladas"
         elif kind == "nuevas":
             ids = [r["id"] for r in db.q("SELECT id FROM questions WHERE is_new=1 AND disabled=0 ORDER BY id LIMIT ?", (n,))]
@@ -172,14 +175,35 @@ def public_q(qrow, reveal=False):
     return d
 
 
+def ready_map(qids):
+    """Qué fuentes están ya preparadas para cada pregunta: {qid: {"ia": bool, "internet": bool}}."""
+    qids = list(qids)
+    out = {q: {"ia": False, "internet": False} for q in qids}
+    for i in range(0, len(qids), 500):
+        part = qids[i:i + 500]
+        for r in db.q("SELECT question_id, source, content FROM sources_cache WHERE question_id IN (%s)" % ",".join("?" * len(part)), part):
+            if r["source"] == "internet" and '"results": []' in (r["content"] or ""):
+                continue
+            if r["source"] in ("ia", "internet"):
+                out[r["question_id"]][r["source"]] = True
+    return out
+
+
 def get_test(tid):
     t = db.q1("SELECT * FROM tests WHERE id=?", (tid,))
     if not t:
         return None
     t["filters"] = json.loads(t["filters"] or "{}")
+    if t.get("time_limit") and not t["finished_at"]:
+        import extras
+        left = extras.time_left(t)
+        if left is not None and left < -30:          # tiempo agotado: se corrige solo
+            return finish(tid)
+        t["time_left"] = left
     items = db.q("""SELECT ti.pos, ti.chosen, ti.is_correct, q.* FROM test_items ti JOIN questions q ON q.id=ti.question_id
                     WHERE ti.test_id=? ORDER BY ti.pos""", (tid,))
     finished = bool(t["finished_at"])
+    ready = ready_map(it["id"] for it in items)
     out = []
     for it in items:
         reveal = finished or (t["mode"] == "practica" and it["chosen"] is not None)
@@ -188,6 +212,7 @@ def get_test(tid):
         d["chosen"] = it["chosen"]
         d["is_correct"] = it["is_correct"] if reveal else None
         d["titles"] = doc_titles(it)
+        d["ready"] = ready.get(it["id"])
         out.append(d)
     t["items"] = out
     return t
@@ -206,20 +231,7 @@ def doc_titles(qrow):
 def _record(qid, tid, chosen, ok, ms=None):
     db.run("INSERT INTO attempts(question_id,test_id,chosen,is_correct,ms) VALUES(?,?,?,?,?)", (qid, tid, chosen, ok, ms))
     db.run("UPDATE questions SET is_new=0 WHERE id=? AND is_new=1", (qid,))
-    r = db.q1("SELECT * FROM review WHERE question_id=?", (qid,))
-    if not ok:
-        due = (dt.date.today() + dt.timedelta(days=1)).isoformat()
-        if r:
-            db.run("UPDATE review SET box=0, due=?, fails=fails+1, last_fail=?, mastered=0 WHERE question_id=?", (due, today(), qid))
-        else:
-            db.run("INSERT INTO review(question_id,box,due,fails,last_fail) VALUES(?,?,?,?,?)", (qid, 0, due, 1, today()))
-    elif r and not r["mastered"] and r["due"] <= today():
-        box = r["box"] + 1
-        if box >= len(INTERVALS):
-            db.run("UPDATE review SET box=?, mastered=1 WHERE question_id=?", (box, qid))
-        else:
-            due = (dt.date.today() + dt.timedelta(days=INTERVALS[box])).isoformat()
-            db.run("UPDATE review SET box=?, due=? WHERE question_id=?", (box, due, qid))
+    srs.review_update(qid, bool(ok))
 
 
 def answer(tid, pos, chosen, ms=None):
@@ -229,6 +241,12 @@ def answer(tid, pos, chosen, ms=None):
         raise KeyError("no existe")
     if t["finished_at"]:
         raise ValueError("El test ya está corregido")
+    if t.get("time_limit"):
+        import extras
+        left = extras.time_left(t)
+        if left is not None and left < -30:
+            finish(tid)
+            raise ValueError("Se acabó el tiempo: el simulacro se ha corregido")
     chosen = (chosen or "").lower() or None
     ok = None if chosen is None else int(chosen == eff(it))
     if t["mode"] == "practica":
@@ -238,6 +256,9 @@ def answer(tid, pos, chosen, ms=None):
                (chosen, ok, ms, tid, pos))
         if chosen is not None:
             _record(it["question_id"], tid, chosen, ok, ms)
+            if not ok:
+                import sources
+                sources.prefetch_ia(it["question_id"], chosen)   # la explicación estará lista al pulsar «IA»
         _update_score(tid)
         return item_result(tid, pos)
     db.run("UPDATE test_items SET chosen=?, ms=? WHERE test_id=? AND pos=?", (chosen, ms, tid, pos))
@@ -247,7 +268,8 @@ def answer(tid, pos, chosen, ms=None):
 def item_result(tid, pos):
     it = db.q1("SELECT ti.pos, ti.chosen, ti.is_correct, q.* FROM test_items ti JOIN questions q ON q.id=ti.question_id WHERE test_id=? AND pos=?", (tid, pos))
     d = public_q(it, True)
-    d.update(pos=it["pos"], chosen=it["chosen"], is_correct=it["is_correct"], titles=doc_titles(it))
+    d.update(pos=it["pos"], chosen=it["chosen"], is_correct=it["is_correct"], titles=doc_titles(it),
+             ready=ready_map([it["id"]])[it["id"]])
     return d
 
 
@@ -257,21 +279,36 @@ def _update_score(tid):
     db.run("UPDATE tests SET ok=?, ko=?, blank=?, score=? WHERE id=?", (ok, ko, blank, round(ok - ko / 3, 2), tid))
 
 
+def sim_extra(t):
+    if t.get("kind") != "simulacro" or not t.get("finished_at"):
+        return t
+    import extras
+    t["breakdown"] = extras.simulacro_breakdown(t["id"])
+    t["history"] = [x for x in extras.simulacros() if x["finished_at"]][:10]
+    return t
+
+
 def finish(tid):
     t = db.q1("SELECT * FROM tests WHERE id=?", (tid,))
     if not t:
         raise KeyError("no existe")
     if not t["finished_at"]:
         if t["mode"] == "examen":
-            for it in db.q("SELECT ti.*, q.correct, q.correct_override FROM test_items ti JOIN questions q ON q.id=ti.question_id WHERE test_id=?", (tid,)):
+            failed = []
+            for it in db.q("SELECT ti.*, q.correct, q.correct_override FROM test_items ti JOIN questions q ON q.id=ti.question_id WHERE test_id=? ORDER BY pos", (tid,)):
                 if it["chosen"] is None:
                     continue
                 ok = int(it["chosen"] == eff(it))
                 db.run("UPDATE test_items SET is_correct=? WHERE test_id=? AND pos=?", (ok, tid, it["pos"]))
                 _record(it["question_id"], tid, it["chosen"], ok, it["ms"])
+                if not ok:
+                    failed.append((it["question_id"], it["chosen"]))
+            if failed:
+                import sources
+                sources.prefetch_many(failed)
         _update_score(tid)
         db.run("UPDATE tests SET finished_at=datetime('now','localtime') WHERE id=?", (tid,))
-    return get_test(tid)
+    return sim_extra(get_test(tid))
 
 
 def set_correct(qid, letter):
@@ -343,7 +380,8 @@ def home():
         "streak": streak(goal),
         "total_questions": db.scalar("SELECT COUNT(*) FROM questions WHERE disabled=0"),
         "ia_questions": db.scalar("SELECT COUNT(*) FROM questions WHERE origin='ia' AND disabled=0"),
-        "open_test": db.q1("SELECT id,title,n FROM tests WHERE finished_at IS NULL ORDER BY id DESC LIMIT 1"),
+        "open_test": db.q1("SELECT id,title,n,kind FROM tests WHERE finished_at IS NULL ORDER BY id DESC LIMIT 1"),
+        "fichas_due": db.scalar("SELECT COUNT(*) FROM fichas WHERE due<=?", (t,)) or 0,
         "temario": docs, "last_job": job,
         "ai_ready": bool(cfg.get("gemini_api_key")),
     }
@@ -597,7 +635,7 @@ Preguntas reales de referencia:
 
 Candidatas:
 {listado}"""
-    res = gemini.generate(prompt, schema=REVIEW_SCHEMA, temperature=0)
+    res = gemini.generate(prompt, schema=REVIEW_SCHEMA, temperature=0, thinking="low", kind="revisión", background=True)
     return {r.get("n"): r for r in (res.get("revision") or [])}
 
 
@@ -647,7 +685,7 @@ Ya generadas de este tema (no repetir):
 
 Texto del temario:
 \"\"\"{ctx[:7500] if ctx else '(no disponible: usa tu conocimiento del temario oficial)'}\"\"\""""
-    res = gemini.generate(prompt, schema=GEN_SCHEMA, temperature=0.8, max_tokens=12000)
+    res = gemini.generate(prompt, schema=GEN_SCHEMA, temperature=0.8, max_tokens=12000, kind="generación", background=True)
     cands = []
     for p in res.get("preguntas") or []:
         opts = [str(p.get(k, "")).strip() for k in LETTERS]
@@ -706,7 +744,7 @@ def _run_job(jid, n, filters, trigger):
         _adapt_level()
         # la revisión descarta parte de lo generado: se preparan más lotes de los justos
         batches = _pick_docs(filters, (n + per_call - 1) // per_call * 2 + 2)
-        made, errors = 0, []
+        made, errors, quota_hit = 0, [], False
         for doc in batches:
             if made >= n:
                 break
@@ -714,6 +752,10 @@ def _run_job(jid, n, filters, trigger):
             try:
                 made += _gen_batch(doc, esc, min(per_call, n - made), jid)
                 db.run("UPDATE gen_jobs SET generated=? WHERE id=?", (made, jid))
+            except gemini.QuotaError as e:
+                errors.append(str(e)[:300])
+                quota_hit = True
+                break                                  # sin cuota: no se sigue gastando intentos
             except Exception as e:
                 errors.append(str(e)[:300])
                 traceback.print_exc()
@@ -722,9 +764,18 @@ def _run_job(jid, n, filters, trigger):
         status = "ok" if made else "error"
         db.run("UPDATE gen_jobs SET status=?, generated=?, error=?, finished_at=datetime('now','localtime') WHERE id=?",
                (status, made, "\n".join(errors[:3]) or None, jid))
+        if trigger == "diario" and quota_hit and made < n:
+            # sin cuota: se vuelve a intentar más tarde con lo que falte (se renueva a las 9:00 en España)
+            blk = gemini.blocked_models()
+            retry = min([v["until"] for v in blk.values()] or [time.time() + 2 * 3600]) + 120
+            db.kv_set("gen_retry_at", retry)
+            db.kv_set("gen_pending", n - made)
+            db.kv_set("gen_day", "")
+        elif trigger == "diario":
+            db.kv_set("gen_pending", 0)
         if made:
             notify("nuevas", f"{made} preguntas nuevas", "Ya tienes preguntas nuevas generadas para hacer.", "#/test/nuevas")
-        elif trigger == "diario":
+        elif trigger == "diario" and not quota_hit:
             notify("error", "No se pudieron generar preguntas", (errors[0] if errors else "Error desconocido")[:200], "#/ajustes")
 
 
@@ -739,10 +790,13 @@ def scheduler_tick(now=None):
     now = now or dt.datetime.now()
     cfg = db.load_config()
     t = now.date().isoformat()
-    if now.hour >= int(cfg.get("daily_gen_hour", 7)) and db.kv_get("gen_day") != t:
+    retry_at = float(db.kv_get("gen_retry_at", 0) or 0)
+    if now.hour >= int(cfg.get("daily_gen_hour", 7)) and db.kv_get("gen_day") != t and time.time() >= retry_at:
         db.kv_set("gen_day", t)
-        if cfg.get("gemini_api_key") and int(cfg.get("daily_new_questions", 20)) > 0:
-            start_generation(int(cfg.get("daily_new_questions", 20)), {}, "diario")
+        pending = int(db.kv_get("gen_pending", 0) or 0)
+        n = pending or int(cfg.get("daily_new_questions", 20))
+        if cfg.get("gemini_api_key") and n > 0:
+            start_generation(n, {}, "diario")
     if now.hour >= int(cfg.get("review_reminder_hour", 9)) and db.kv_get("rev_day") != t:
         db.kv_set("rev_day", t)
         due = db.scalar("SELECT COUNT(*) FROM review WHERE mastered=0 AND due<=?", (t,))

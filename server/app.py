@@ -2,6 +2,7 @@
     uvicorn app:app --host 0.0.0.0 --port 8790
 """
 import json
+import mimetypes
 import os
 import threading
 import time
@@ -19,8 +20,12 @@ import db
 import logic
 import sources
 import gemini
+import prefetch
+import extras
+import fichas
 
 WEB = os.path.join(db.BASE, "web")
+mimetypes.add_type("text/javascript", ".mjs")   # Python 3.11 no lo conoce y los módulos JS lo exigen
 VERSION = "1.0.0"
 
 
@@ -155,7 +160,45 @@ def tests_get(req, body):
     t = logic.get_test(int(req.path_params["tid"]))
     if not t:
         raise KeyError("test")
+    return logic.sim_extra(t)
+
+
+def sim_create(req, body):
+    return extras.create_simulacro(body.get("n"), body.get("minutes"))
+
+
+def sim_list(req, body):
+    return {"items": extras.simulacros(), "per_block": extras._split(int(db.load_config().get("sim_questions", 100)), extras._block_weights())}
+
+
+def quick(req, body):
+    t = extras.quick_test(max(1, min(100, int(body.get("n", 10)))), body.get("title") or "5 minutos")
+    if not t:
+        raise ValueError("No hay preguntas disponibles")
     return t
+
+
+def mapa(req, body):
+    return extras.topic_map(qp(req, "temario"))
+
+
+def widget_data(req, body):
+    return extras.widget()
+
+
+def fichas_list(req, body):
+    return {"items": fichas.due_list(qp(req, "doc"), qp(req, "limit", 40, int), qp(req, "all") == "1"), **fichas.summary()}
+
+
+def fichas_review(req, body):
+    return fichas.review(int(req.path_params["fid"]), bool(body.get("ok")))
+
+
+def fichas_generate(req, body):
+    if not db.load_config().get("gemini_api_key"):
+        raise ValueError("Configura primero la API key de Gemini")
+    n = fichas.generate_batch(background=False)
+    return {"created": n, **fichas.summary()}
 
 
 def tests_answer(req, body):
@@ -199,6 +242,7 @@ def question_get(req, body):
         raise KeyError("pregunta")
     d = logic.public_q(q, True)
     d["titles"] = logic.doc_titles(q)
+    d["ready"] = logic.ready_map([qid])[qid]
     d["attempts"] = db.q("SELECT answered_at, chosen, is_correct FROM attempts WHERE question_id=? ORDER BY id DESC LIMIT 20", (qid,))
     d["review"] = db.q1("SELECT * FROM review WHERE question_id=?", (qid,))
     return d
@@ -255,13 +299,19 @@ def notif_list(req, body):
 
 
 SETTINGS_KEYS = ["gemini_model", "gemini_fallback_models", "daily_goal", "daily_new_questions", "daily_gen_hour",
-                 "review_reminder_hour", "goal_reminder_hour", "default_escala"]
+                 "review_reminder_hour", "goal_reminder_hour", "default_escala", "ai_prefetch_daily", "net_prefetch_daily",
+                 "batch_enabled", "batch_max_requests", "batch_model", "batch_net_nightly", "batch_start_hour", "batch_end_hour",
+                 "fichas_daily_requests", "sim_questions", "sim_minutes", "target_retention"]
 
 
 def settings_get(req, body):
     cfg = db.load_config()
     out = {k: cfg.get(k) for k in SETTINGS_KEYS}
     key = cfg.get("gemini_api_key") or ""
+    tk = cfg.get("tavily_api_key") or ""
+    out["tavily_key_set"] = bool(tk)
+    out["tavily_key_hint"] = ("…" + tk[-4:]) if tk else ""
+    out["tavily_used"] = sources.tavily_used()
     out["gemini_api_key_set"] = bool(key)
     out["gemini_api_key_hint"] = ("…" + key[-4:]) if key else ""
     out["temario_dir"] = db.TEMARIO_DIR
@@ -275,13 +325,26 @@ def settings_save(req, body):
     for k in SETTINGS_KEYS:
         if k in body:
             v = body[k]
-            if k in ("daily_goal", "daily_new_questions", "daily_gen_hour", "review_reminder_hour", "goal_reminder_hour"):
+            if k in ("daily_goal", "daily_new_questions", "daily_gen_hour", "review_reminder_hour", "goal_reminder_hour",
+                     "ai_prefetch_daily", "net_prefetch_daily", "batch_max_requests", "batch_net_nightly",
+                     "batch_start_hour", "batch_end_hour", "fichas_daily_requests", "sim_questions", "sim_minutes"):
                 v = int(v)
+            if k == "target_retention":
+                v = max(0.75, min(0.97, float(v)))
+            if k == "batch_enabled":
+                v = v in (True, "1", "true", "si", "sí", 1)
             if k == "gemini_fallback_models" and isinstance(v, str):
                 v = [x.strip() for x in v.split(",") if x.strip()]
             cfg[k] = v
     if body.get("gemini_api_key"):
         cfg["gemini_api_key"] = body["gemini_api_key"].strip()
+    if "tavily_api_key" in body and body["tavily_api_key"] is not None:
+        v = body["tavily_api_key"].strip()
+        if v == "-":
+            cfg["tavily_api_key"] = ""
+        elif v:
+            cfg["tavily_api_key"] = v
+            db.kv_set("search_pause_tavily", 0)
     if "gen_level" in body:
         lv = str(body["gen_level"])
         db.kv_set("gen_level_auto", "1" if lv == "auto" else "0")
@@ -292,8 +355,64 @@ def settings_save(req, body):
 
 
 def settings_test_ai(req, body):
-    txt = gemini.generate("Responde solo con la palabra: funciona", temperature=0)
-    return {"ok": True, "reply": txt[:100], "model": db.load_config().get("gemini_model")}
+    """Diagnóstico rápido: conexión, validez de la key, modelo disponible y una respuesta de prueba."""
+    import urllib.error
+    cfg = db.load_config()
+    key = (cfg.get("gemini_api_key") or "").strip()
+    if not key:
+        raise ValueError("Pega primero la API key.")
+    notes = []
+    try:
+        available = gemini.list_models(key)
+    except urllib.error.HTTPError as e:
+        raise ValueError(gemini._explain_http(e.code, e.read().decode("utf-8", "ignore")))
+    except Exception as e:
+        raise ValueError(f"La Raspberry no consigue conectar con Google ({getattr(e, 'reason', e)}). "
+                         "Comprueba que tiene Internet.")
+    best, backups = gemini.pick_models(available)
+    current = cfg.get("gemini_model")
+    if current not in available and best:
+        notes.append(f"El modelo {current} no está disponible en tu cuenta; uso {best}.")
+        cfg["gemini_model"] = best
+    main = cfg["gemini_model"]
+    usable_backups = [m for m in (cfg.get("gemini_fallback_models") or []) if m in available and m != main]
+    extra = [m for m in [best] + backups if m and m != main and m not in usable_backups]
+    cfg["gemini_fallback_models"] = (usable_backups + extra)[:2]
+    db.save_config(cfg)
+    txt = gemini.generate("Responde solo con la palabra: funciona", temperature=0, quick=True, max_tokens=20)
+    return {"ok": True, "reply": txt[:100], "model": cfg["gemini_model"],
+            "fallbacks": cfg["gemini_fallback_models"], "notes": notes}
+
+
+def diag(req, body):
+    """Estado de la Pi y tiempos de las últimas llamadas a la IA."""
+    now = time.time()
+    out = {"calls": list(reversed(gemini.CALLS)), "model": db.load_config().get("gemini_model"),
+           "usage": gemini.usage_today(),
+           "blocked": {m: {"why": v["why"], "until": time.strftime("%H:%M", time.localtime(v["until"]))}
+                       for m, v in gemini.blocked_models().items()},
+           "gen_retry": (time.strftime("%H:%M", time.localtime(float(db.kv_get("gen_retry_at", 0) or 0)))
+                         if float(db.kv_get("gen_retry_at", 0) or 0) > now else None)}
+    try:
+        out["load"] = [round(x, 2) for x in os.getloadavg()]
+        out["cpus"] = os.cpu_count()
+    except Exception:
+        pass
+    try:
+        out["temp"] = round(int(open("/sys/class/thermal/thermal_zone0/temp").read()) / 1000, 1)
+    except Exception:
+        pass
+    try:
+        mem = dict(l.split(":", 1) for l in open("/proc/meminfo"))
+        out["mem_free_mb"] = int(mem["MemAvailable"].split()[0]) // 1024
+    except Exception:
+        pass
+    out["prefetch"] = prefetch.status()
+    out["search"] = sources.search_status()
+    out["night"] = prefetch.night_status()
+    out["ocr"] = db.q1("SELECT SUM(status IN ('ocr','procesando')) working, SUM(status='ok') ok, COUNT(*) n FROM docs")
+    t = time.time(); db.scalar("SELECT COUNT(*) FROM pages_fts WHERE pages_fts MATCH 'datos'"); out["db_ms"] = int((time.time() - t) * 1000)
+    return out
 
 
 def notif_test(req, body):
@@ -323,6 +442,14 @@ routes = [
     R("/api/tests/{tid:int}/finish", tests_finish, ["POST"]),
     R("/api/tests/{tid:int}/retry", tests_retry, ["POST"]),
     R("/api/history", history),
+    R("/api/simulacro", sim_create, ["POST"]),
+    R("/api/simulacro", sim_list),
+    R("/api/quick", quick, ["POST"]),
+    R("/api/mapa", mapa),
+    R("/api/widget", widget_data),
+    R("/api/fichas", fichas_list),
+    R("/api/fichas/generate", fichas_generate, ["POST"]),
+    R("/api/fichas/{fid:int}/review", fichas_review, ["POST"]),
     R("/api/failed", failed),
     R("/api/questions/{qid:int}", question_get),
     R("/api/questions/{qid:int}/correct", question_correct, ["POST"]),
@@ -336,6 +463,7 @@ routes = [
     R("/api/notifications", notif),
     R("/api/notifications/all", notif_list),
     R("/api/notifications/test", notif_test, ["POST"]),
+    R("/api/diag", diag),
     R("/api/settings", settings_get),
     R("/api/settings", settings_save, ["POST"]),
     R("/api/settings/test_ai", settings_test_ai, ["POST"]),
@@ -359,6 +487,7 @@ def _startup():
         importer.main()
     if os.environ.get("OPOTEST_NO_SCHEDULER") != "1":
         threading.Thread(target=_scheduler, daemon=True).start()
+        prefetch.start()
 
 
 import contextlib
