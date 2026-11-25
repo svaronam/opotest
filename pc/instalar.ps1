@@ -42,9 +42,37 @@ if ($LASTEXITCODE -ne 0) {
 
 function CopiarSupuestos {
     if (-not (Test-Path $Supuestos)) { Write-Host "No encuentro la carpeta de supuestos: $Supuestos" -ForegroundColor Yellow; return }
-    Paso "Copiando los supuestos prácticos (sin vídeos)"
-    Copiar $Supuestos @(".") "~/opotest/temario/SP" @("*.mp4", "*.3gp", "*.mov", "*.avi", "*.mkv", "*.png", "*.jpg")
-    ssh $Pi "sudo systemctl restart opotest-ocr"
+    Paso "Copiando los supuestos prácticos (sin vídeos ni imágenes)"
+    # tar de Windows falla con nombres con tildes: se empaqueta en un zip (UTF-8) y se descomprime en la Pi
+    Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+    $fuera = @(".mp4", ".3gp", ".mov", ".avi", ".mkv", ".png", ".jpg", ".jpeg", ".url", ".vpd")
+    $base = (Resolve-Path $Supuestos).Path.TrimEnd("\")
+    $zip = Join-Path $env:TEMP "opotest_supuestos.zip"
+    if (Test-Path $zip) { Remove-Item $zip -Force }
+    $archivos = Get-ChildItem -LiteralPath $base -Recurse -File -ErrorAction SilentlyContinue | Where-Object { $fuera -notcontains $_.Extension.ToLower() }
+    $mb = [math]::Round((($archivos | Measure-Object Length -Sum).Sum) / 1MB)
+    Write-Host "Empaquetando $($archivos.Count) archivos ($mb MB)..."
+    $z = [System.IO.Compression.ZipFile]::Open($zip, "Create")
+    $fallos = 0
+    try {
+        foreach ($f in $archivos) {
+            $rel = $f.FullName.Substring($base.Length + 1).Replace("\", "/")
+            try { [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($z, $f.FullName, $rel, "NoCompression") }
+            catch { $fallos++ }
+        }
+    } finally { $z.Dispose() }
+    if ($fallos) { Write-Host "  $fallos archivos no se pudieron leer y se omiten" -ForegroundColor Yellow }
+    $libre = [int](ssh $Pi "df -Pm ~ | awk 'NR==2{print `$4}'")
+    if ($libre -lt (2 * $mb + 300)) {
+        Remove-Item $zip -Force
+        throw "En la Raspberry quedan $libre MB libres y hacen falta unos $(2 * $mb + 300) MB. Libera espacio y repite."
+    }
+    Write-Host "Enviando a la Raspberry..."
+    scp $zip "${Pi}:opotest/sp_upload.zip"
+    if ($LASTEXITCODE -ne 0) { throw "Falló el envío de los supuestos" }
+    ssh $Pi "python3 ~/opotest/pi/extraer_zip.py ~/opotest/sp_upload.zip ~/opotest/temario/SP; r=`$?; rm -f ~/opotest/sp_upload.zip; sudo -n systemctl restart opotest-ocr 2>/dev/null; exit `$r"
+    if ($LASTEXITCODE -ne 0) { throw "Falló la descompresión en la Raspberry" }
+    Remove-Item $zip -Force
     Write-Host "Supuestos copiados. Se leen en segundo plano y la IA va sacando el catálogo poco a poco."
 }
 
